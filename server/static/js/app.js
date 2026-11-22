@@ -1,5 +1,6 @@
 /**
- * Self-Healing Software Ecosystem - Frontend Application
+ * AIOps Autonomous Self-Healing Ecosystem - Frontend Logic
+ * Design System: CRED Luxury Brutalism & H&M High-Fashion Editorial
  * Handles Real-Time WebSockets, Vis.js 100-Service Dynamic Graph,
  * Chart.js Golden Signals, Chaos Injection, and Stepped Pipeline Execution.
  */
@@ -16,7 +17,7 @@ let chartError = null;
 let chartPool = null;
 let chartRps = null;
 
-// Telemetry history for charts (max 20 data points)
+// Telemetry history for charts (max 25 data points)
 const historyP99 = [];
 const historyError = [];
 const historyPool = [];
@@ -31,53 +32,102 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------------------------------------
-// 1. Chart.js Golden Signal Telemetry Initialization
+// 1. Minimalist Editorial Chart.js Initialization
 // -------------------------------------------------------------
 function initCharts() {
-    const commonOptions = {
+    const editorialOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#121212',
+                titleFont: { family: 'JetBrains Mono', size: 10 },
+                bodyFont: { family: 'JetBrains Mono', size: 11 },
+                borderColor: '#27272a',
+                borderWidth: 1,
+                padding: 8,
+                cornerRadius: 2,
+                displayColors: false
+            }
+        },
         scales: {
             x: { display: false },
             y: {
                 display: true,
-                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                ticks: { color: '#64748b', font: { size: 9 } }
+                grid: { color: 'rgba(255, 255, 255, 0.03)', drawTicks: false },
+                ticks: {
+                    color: '#52525b',
+                    font: { family: 'JetBrains Mono', size: 8 },
+                    maxTicksLimit: 3
+                },
+                border: { display: false }
             }
         },
         elements: {
-            point: { radius: 0 },
-            line: { tension: 0.35, borderWidth: 2 }
+            point: { radius: 0, hoverRadius: 3, hoverBorderColor: '#ffffff' },
+            line: { tension: 0.25, borderWidth: 1.5 }
         }
     };
 
     const ctxP99 = document.getElementById("chart-p99").getContext("2d");
     chartP99 = new Chart(ctxP99, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ data: historyP99, borderColor: "#06b6d4", backgroundColor: "rgba(6, 182, 212, 0.1)", fill: true }] },
-        options: commonOptions
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                data: historyP99,
+                borderColor: "#ffffff",
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                fill: true
+            }]
+        },
+        options: editorialOptions
     });
 
     const ctxError = document.getElementById("chart-error").getContext("2d");
     chartError = new Chart(ctxError, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ data: historyError, borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.1)", fill: true }] },
-        options: commonOptions
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                data: historyError,
+                borderColor: "#ef4444",
+                backgroundColor: "rgba(239, 68, 68, 0.02)",
+                fill: true
+            }]
+        },
+        options: editorialOptions
     });
 
     const ctxPool = document.getElementById("chart-pool").getContext("2d");
     chartPool = new Chart(ctxPool, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ data: historyPool, borderColor: "#f59e0b", backgroundColor: "rgba(245, 158, 11, 0.1)", fill: true }] },
-        options: commonOptions
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                data: historyPool,
+                borderColor: "#d4af37",
+                backgroundColor: "rgba(212, 175, 55, 0.02)",
+                fill: true
+            }]
+        },
+        options: editorialOptions
     });
 
     const ctxRps = document.getElementById("chart-rps").getContext("2d");
     chartRps = new Chart(ctxRps, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ data: historyRps, borderColor: "#8b5cf6", backgroundColor: "rgba(139, 92, 246, 0.1)", fill: true }] },
-        options: commonOptions
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                data: historyRps,
+                borderColor: "#a1a1aa",
+                backgroundColor: "rgba(161, 161, 170, 0.02)",
+                fill: true
+            }]
+        },
+        options: editorialOptions
     });
 }
 
@@ -102,7 +152,7 @@ function updateChartData(p99, errorRate, poolSat, rps) {
     chartPool.update();
     chartRps.update();
 
-    // Update numbers
+    // Update numbers with monospace formatting
     document.getElementById("metric-p99").innerHTML = `${p99.toFixed(1)} <span class="unit">ms</span>`;
     document.getElementById("metric-error").innerHTML = `${(errorRate * 100).toFixed(2)} <span class="unit">%</span>`;
     document.getElementById("metric-pool").innerHTML = `${(poolSat * 100).toFixed(1)} <span class="unit">%</span>`;
@@ -122,34 +172,48 @@ async function loadTopology() {
 
         data.nodes.forEach((n) => {
             nodeLookup[n.id] = n;
-            let color = "#06b6d4";
-            if (n.status === "CRITICAL") color = "#ef4444";
-            else if (n.status === "DEGRADED") color = "#f59e0b";
-            else if (n.status === "SELF_HEALING") color = "#a855f7";
+            let bgColor = "#1c1c1f";
+            let borderColor = "#3f3f46";
+            let fontColor = "#a1a1aa";
+
+            if (n.status === "CRITICAL") {
+                bgColor = "#ef4444";
+                borderColor = "#ffffff";
+                fontColor = "#ffffff";
+            } else if (n.status === "DEGRADED") {
+                bgColor = "#713f12";
+                borderColor = "#eab308";
+                fontColor = "#fef08a";
+            } else if (n.status === "SELF_HEALING") {
+                bgColor = "#ffffff";
+                borderColor = "#ffffff";
+                fontColor = "#000000";
+            }
 
             visNodes.push({
                 id: n.id,
                 label: n.name.length > 18 ? n.name.substring(0, 16) + '..' : n.name,
-                title: `${n.name} (${n.id})\nTier: ${n.tier}\nHost: ${n.host_node}\np99: ${n.p99_latency_ms}ms`,
+                title: `${n.name} [${n.id}]\nTier: ${n.tier}\nHost: ${n.host_node}\np99: ${n.p99_latency_ms}ms`,
                 color: {
-                    background: color,
-                    border: "#1e293b",
-                    highlight: { background: "#ffffff", border: color }
+                    background: bgColor,
+                    border: borderColor,
+                    highlight: { background: "#ffffff", border: "#ffffff" }
                 },
-                font: { color: "#ffffff", size: 10, face: "Plus Jakarta Sans" },
+                font: { color: fontColor, size: 9, face: "JetBrains Mono" },
                 shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
-                size: n.id === "svc-066" ? 22 : 14
+                size: n.id === "svc-066" ? 20 : 12
             });
         });
 
         data.edges.forEach((e, idx) => {
+            const isHighLatency = e.p99_latency_ms > 500;
             visEdges.push({
                 id: `e-${idx}`,
                 from: e.source,
                 to: e.target,
                 arrows: "to",
-                color: { color: e.p99_latency_ms > 500 ? "#ef4444" : "#334155", opacity: 0.6 },
-                width: e.p99_latency_ms > 500 ? 2 : 1
+                color: { color: isHighLatency ? "#ef4444" : "#27272a", opacity: isHighLatency ? 0.9 : 0.4 },
+                width: isHighLatency ? 1.8 : 0.8
             });
         });
 
@@ -161,15 +225,15 @@ async function loadTopology() {
 
         const options = {
             nodes: {
-                borderWidth: 1.5,
-                shadow: { enabled: true, color: "rgba(0,0,0,0.5)", size: 5 }
+                borderWidth: 1.2,
+                shadow: false
             },
             edges: {
                 smooth: { type: "continuous" }
             },
             physics: {
-                stabilization: { iterations: 120 },
-                barnesHut: { gravitationalConstant: -3500, centralGravity: 0.3, springLength: 75 }
+                stabilization: { iterations: 100 },
+                barnesHut: { gravitationalConstant: -3200, centralGravity: 0.28, springLength: 70 }
             },
             interaction: { hover: true, tooltipDelay: 200 }
         };
@@ -196,15 +260,25 @@ function selectService(serviceId) {
     const n = nodeLookup[serviceId];
     if (!n) return;
 
-    document.getElementById("inspector-service-name").textContent = `Service Inspector: ${n.name} (${n.id})`;
-    document.getElementById("inspector-service-status").textContent = n.status;
-    document.getElementById("inspector-service-status").className = `badge ${n.status.toLowerCase()}`;
+    document.getElementById("inspector-service-name").textContent = `${n.name} [${n.id}]`;
+    const statusEl = document.getElementById("inspector-service-status");
+    statusEl.textContent = n.status;
+
+    if (n.status === "CRITICAL") {
+        statusEl.className = "status-chip chip-breached";
+    } else if (n.status === "DEGRADED") {
+        statusEl.className = "status-chip chip-gold";
+    } else if (n.status === "SELF_HEALING") {
+        statusEl.className = "status-chip chip-selected";
+    } else {
+        statusEl.className = "status-chip chip-safe";
+    }
 
     document.getElementById("ins-p99").textContent = `${n.p99_latency_ms.toFixed(1)} ms`;
     document.getElementById("ins-err").textContent = `${(n.error_rate * 100).toFixed(2)}%`;
     const poolSat = (n.db_pool_active / Math.max(1, n.db_pool_max) * 100).toFixed(0);
     document.getElementById("ins-pool").textContent = `${n.db_pool_active} / ${n.db_pool_max} (${poolSat}%)`;
-    document.getElementById("ins-reps").textContent = `${n.replicas} Pods (${n.host_node})`;
+    document.getElementById("ins-reps").textContent = `${n.replicas} Pods [${n.host_node}]`;
 
     const preview = document.getElementById("ins-log-preview");
     if (n.active_fault === "DB_POOL_EXHAUSTION") {
@@ -215,13 +289,13 @@ function selectService(serviceId) {
         preview.textContent = `[CRITICAL] java.lang.OutOfMemoryError: Java heap space
 [WARN] Full GC pause took 2840ms. Stop-the-world event triggered.`;
     } else {
-        preview.textContent = `[INFO] ${n.name} healthy. Receiving ${n.request_rate_rps.toFixed(0)} req/s.
+        preview.textContent = `[INFO] ${n.name} healthy. Inbound throughput: ${n.request_rate_rps.toFixed(0)} req/s.
 [INFO] W3C trace context propagated over gRPC. p99 response time: ${n.p99_latency_ms.toFixed(1)}ms`;
     }
 }
 
 function resetGraphView() {
-    if (network) network.fit({ animation: { duration: 600, easingFunction: "easeInOutQuad" } });
+    if (network) network.fit({ animation: { duration: 500, easingFunction: "easeInOutQuad" } });
 }
 
 // -------------------------------------------------------------
@@ -245,18 +319,17 @@ function initWebSocket() {
 
                 // Update status badge
                 const faultCount = Object.keys(data.active_faults).length;
-                document.getElementById("active-fault-pill").textContent = `${faultCount} Active Fault${faultCount === 1 ? '' : 's'}`;
+                document.getElementById("active-fault-pill").textContent = `${faultCount} Active`;
 
-                const badge = document.getElementById("system-status-badge");
                 const badgeText = document.getElementById("system-status-text");
-                const dot = badge.querySelector(".status-dot");
+                const dot = document.getElementById("system-status-badge").querySelector(".pip");
 
                 if (faultCount === 0) {
-                    badgeText.textContent = "CLUSTER OPERATIONAL";
-                    dot.className = "status-dot healthy";
+                    badgeText.textContent = "SYSTEM OPERATIONAL";
+                    dot.className = "pip pip-live";
                 } else {
-                    badgeText.textContent = `INCIDENT DETECTED (${faultCount})`;
-                    dot.className = "status-dot critical";
+                    badgeText.textContent = `ANOMALY DETECTED // ${faultCount} FAULT${faultCount === 1 ? '' : 'S'}`;
+                    dot.className = "pip pip-critical";
                 }
 
                 // Periodically sync nodeLookup
@@ -281,11 +354,29 @@ async function refreshTopologyStatus(activeFaults) {
         data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
             if (networkData.nodes) {
-                let color = "#06b6d4";
-                if (n.status === "CRITICAL") color = "#ef4444";
-                else if (n.status === "DEGRADED") color = "#f59e0b";
-                else if (n.status === "SELF_HEALING") color = "#a855f7";
-                networkData.nodes.update({ id: n.id, color: { background: color, border: "#1e293b" } });
+                let bgColor = "#1c1c1f";
+                let borderColor = "#3f3f46";
+                let fontColor = "#a1a1aa";
+
+                if (n.status === "CRITICAL") {
+                    bgColor = "#ef4444";
+                    borderColor = "#ffffff";
+                    fontColor = "#ffffff";
+                } else if (n.status === "DEGRADED") {
+                    bgColor = "#713f12";
+                    borderColor = "#eab308";
+                    fontColor = "#fef08a";
+                } else if (n.status === "SELF_HEALING") {
+                    bgColor = "#ffffff";
+                    borderColor = "#ffffff";
+                    fontColor = "#000000";
+                }
+
+                networkData.nodes.update({
+                    id: n.id,
+                    color: { background: bgColor, border: borderColor },
+                    font: { color: fontColor }
+                });
             }
         });
         if (currentSelectedNodeId && nodeLookup[currentSelectedNodeId]) {
@@ -301,19 +392,21 @@ function setPipelineStage(stageNum, message) {
     currentStage = stageNum;
     for (let i = 1; i <= 6; i++) {
         const card = document.getElementById(`step-card-${i}`);
-        const pill = document.getElementById(`step-status-${i}`);
+        const statusEl = document.getElementById(`step-status-${i}`);
+        if (!card || !statusEl) continue;
+
         if (i < stageNum) {
-            card.className = "step-card";
-            pill.textContent = "Passed";
-            pill.style.color = "#10b981";
+            card.className = "stage-tile";
+            statusEl.textContent = "VERIFIED";
+            statusEl.style.color = "var(--accent-emerald)";
         } else if (i === stageNum) {
-            card.className = "step-card active";
-            pill.textContent = "Executing";
-            pill.style.color = "#c4b5fd";
+            card.className = "stage-tile active";
+            statusEl.textContent = "EXECUTING";
+            statusEl.style.color = "#ffffff";
         } else {
-            card.className = "step-card";
-            pill.textContent = "Idle";
-            pill.style.color = "#64748b";
+            card.className = "stage-tile";
+            statusEl.textContent = "STANDBY";
+            statusEl.style.color = "var(--text-subtle)";
         }
     }
     if (message) {
@@ -336,27 +429,27 @@ async function stepStage() {
         }
         refreshTopologyStatus({});
     } catch (e) {
-        alert("Error executing stage step: " + e);
+        alert("Pipeline step error: " + e);
     }
 }
 
 async function triggerAutoHeal() {
     const banner = document.getElementById("pipeline-status-text");
-    banner.textContent = "Autonomous Closed-Loop OODA Pipeline Executing...";
+    banner.textContent = "Autonomous Closed-Loop OODA Execution in Progress...";
 
     try {
         const resp = await fetch("/api/self-heal/auto", { method: "POST" });
         const res = await resp.json();
 
         if (res.status === "REMEDIATED") {
-            setPipelineStage(1, `Incident ${res.incident_id} Resolved! Root Cause: ${res.culprit_service} (${res.fault_type}). Remediation: ${res.selected_remediation}. p99 restored to ${res.post_p99_ms}ms.`);
+            setPipelineStage(1, `Incident ${res.incident_id} Resolved. Root Cause: ${res.culprit_service} (${res.fault_type}). Remediation: ${res.selected_remediation}. p99 restored to ${res.post_p99_ms}ms.`);
             refreshLedger();
         } else {
             setPipelineStage(1, res.message);
         }
         refreshTopologyStatus({});
     } catch (e) {
-        alert("Error in auto-heal: " + e);
+        alert("Autonomous execution error: " + e);
     }
 }
 
@@ -371,11 +464,11 @@ async function triggerChaos(scenario, target) {
             body: JSON.stringify({ scenario, target_service: target })
         });
         const res = await resp.json();
-        setPipelineStage(1, `Chaos Injected: ${res.details.description} on ${res.details.target_name}`);
+        setPipelineStage(1, `FAULT INJECTED // ${res.details.description} on ${res.details.target_name}`);
         selectService(target);
         refreshTopologyStatus({});
     } catch (e) {
-        alert("Failed to inject chaos: " + e);
+        alert("Failed to inject chaos experiment: " + e);
     }
 }
 
@@ -383,7 +476,7 @@ async function clearChaos() {
     try {
         const resp = await fetch("/api/chaos/clear", { method: "POST" });
         const res = await resp.json();
-        setPipelineStage(1, "Cluster reset to healthy operating baseline.");
+        setPipelineStage(1, "Cluster steady-state baseline restored. Injected faults cleared.");
         refreshTopologyStatus({});
     } catch (e) {
         alert("Failed to clear chaos: " + e);
@@ -400,19 +493,19 @@ async function refreshLedger() {
         const tbody = document.getElementById("incident-ledger-body");
 
         if (data.incidents.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No incidents recorded yet. Inject a chaos fault above to trigger autonomous remediation.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No incidents logged. Execute a synthetic fault above to initiate the autonomous cycle.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = data.incidents.map(inc => `
             <tr>
-                <td><code>${inc.incident_id}</code></td>
-                <td><strong style="color:#ef4444">${inc.culprit_service}</strong></td>
-                <td><span class="badge-mini safe">94.0%</span></td>
-                <td><code>${inc.remediation_action}</code></td>
-                <td>${inc.mttd_sec}s</td>
-                <td><strong style="color:#10b981">${inc.mttr_sec}s</strong></td>
-                <td><span class="badge-mini safe">${inc.verdict}</span></td>
+                <td><span class="mono-code">${inc.incident_id}</span></td>
+                <td><strong style="color:var(--accent-crimson)">${inc.culprit_service}</strong></td>
+                <td><span class="status-chip chip-gold">94.0%</span></td>
+                <td><span class="mono-code">${inc.remediation_action}</span></td>
+                <td><span class="mono-code">${inc.mttd_sec}s</span></td>
+                <td><span class="val-positive">${inc.mttr_sec}s</span></td>
+                <td><span class="status-chip chip-safe">${inc.verdict}</span></td>
             </tr>
         `).join("");
     } catch (e) {
