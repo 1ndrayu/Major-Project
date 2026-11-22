@@ -1,56 +1,56 @@
 /* ==========================================================================
-   CRED LUXURY DARK & H&M HIGH-FASHION EDITORIAL DESIGN SYSTEM
-   Authentic Neo-Brutalist Architectural Canvas • Pitch Obsidian
+   CRED LUXURY & H&M HIGH-FASHION EDITORIAL DESIGN SYSTEM (LIGHT MODE)
+   Architectural Paper Canvas • Pristine Stark White • Pitch Black Ink
    Surgical Monochrome • Debossed Tactile Plates • Zero AI-Slop
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-    /* CRED Pure Obsidian Palette */
+    /* Pure Monochromatic Light Canvas */
+    --cred-canvas: #f5f5f7;
+    --cred-surface: #ffffff;
+    --cred-surface-raised: #ffffff;
+    --cred-surface-hover: #fafafa;
+    --cred-recessed: #eeeeee;
+
+    /* Architectural Hairline Borders */
+    --cred-border-hairline: #e5e5ea;
+    --cred-border-subtle: #d1d1d6;
+    --cred-border-contrast: #18181b;
+    --cred-border-black: #000000;
+
+    /* High-Fashion Editorial Typography (Ink on Paper) */
     --cred-black: #000000;
-    --cred-canvas: #050507;
-    --cred-surface: #0a0a0d;
-    --cred-surface-raised: #101014;
-    --cred-surface-hover: #16161b;
-    --cred-recessed: #060608;
+    --cred-ink: #09090b;
+    --cred-charcoal: #18181b;
+    --cred-graphite: #3f3f46;
+    --cred-zinc: #71717a;
+    --cred-muted: #8e8e93;
+    --cred-subtle: #a1a1aa;
 
-    /* Hairline Architectural Dividers */
-    --cred-border-hairline: #18181d;
-    --cred-border-subtle: #22222a;
-    --cred-border-contrast: #32323d;
-    --cred-border-white: #ffffff;
-
-    /* High-Fashion Editorial Typography */
-    --cred-white: #ffffff;
-    --cred-chalk: #f2f2f2;
-    --cred-platinum: #cccccc;
-    --cred-zinc: #888888;
-    --cred-muted: #555555;
-    --cred-dark: #333333;
-
-    /* CRED Luxury Precision Accents */
-    --cred-gold: #c5a059;
-    --cred-gold-dim: rgba(197, 160, 89, 0.12);
-    --cred-crimson: #ff3344;
-    --cred-crimson-dim: rgba(255, 51, 68, 0.12);
-    --cred-emerald: #00e676;
-    --cred-emerald-dim: rgba(0, 230, 118, 0.1);
+    /* Luxury Precision Accents (Calibrated for High Contrast on Light Canvas) */
+    --cred-gold: #8a6508;
+    --cred-gold-dim: rgba(138, 101, 8, 0.08);
+    --cred-crimson: #dc2626;
+    --cred-crimson-dim: rgba(220, 38, 38, 0.08);
+    --cred-emerald: #15803d;
+    --cred-emerald-dim: rgba(21, 128, 61, 0.08);
 
     /* Fonts */
-    --font-heading: 'Space Grotesk', -apple-system, sans-serif;
-    --font-body: 'Space Grotesk', -apple-system, sans-serif;
+    --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    /* Architectural Sharp Corners (CRED & H&M Zero-Radius Brutalism) */
+    /* Architectural Zero-Radius Brutalism */
     --radius-none: 0px;
     --radius-sharp: 1px;
     --radius-subtle: 2px;
 
-    /* CRED Tactile Neumorphic / Debossed Shadows */
-    --shadow-debossed: inset 1px 1px 3px rgba(0, 0, 0, 0.9), inset -1px -1px 2px rgba(255, 255, 255, 0.03);
-    --shadow-plate: 0 10px 30px -10px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-button-white: 0 4px 20px rgba(255, 255, 255, 0.18);
+    /* Tactile Debossed & Elevated Light Shadows */
+    --shadow-debossed: inset 1px 1px 3px rgba(0, 0, 0, 0.05), inset -1px -1px 2px rgba(255, 255, 255, 0.8);
+    --shadow-plate: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    --shadow-button-black: 0 4px 16px rgba(0, 0, 0, 0.16);
 }
 
 /* Base Reset */
@@ -64,17 +64,16 @@
 
 body {
     background-color: var(--cred-canvas);
-    color: var(--cred-chalk);
+    color: var(--cred-charcoal);
     font-family: var(--font-body);
     font-size: 13px;
     line-height: 1.5;
     letter-spacing: -0.01em;
     overflow-x: hidden;
     background-image: 
-        radial-gradient(circle at 50% 0%, #121218 0%, transparent 40%),
-        linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-    background-size: 100% 100%, 40px 40px, 40px 40px;
+        linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
 }
 
 /* Master Layout Frame */
@@ -88,7 +87,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   MASTHEAD: CRED CLUB EDITORIAL BRANDING
+   MASTHEAD: EDITORIAL LIGHT MONOCHROME
    -------------------------------------------------------------------------- */
 .masthead {
     display: flex;
@@ -96,7 +95,6 @@ body {
     align-items: center;
     background: var(--cred-surface);
     border: 1px solid var(--cred-border-subtle);
-    border-radius: var(--radius-none);
     padding: 20px 28px;
     box-shadow: var(--shadow-plate);
     position: relative;
@@ -108,8 +106,8 @@ body {
     top: -1px;
     left: 20px;
     right: 20px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    height: 2px;
+    background: var(--cred-black);
 }
 
 .masthead-brand {
@@ -121,24 +119,24 @@ body {
 .brand-monogram {
     width: 44px;
     height: 44px;
-    background: #ffffff;
-    color: #000000;
+    background: #000000;
+    color: #ffffff;
     border-radius: var(--radius-none);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-heading);
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     letter-spacing: -0.05em;
-    box-shadow: var(--shadow-button-white);
+    box-shadow: var(--shadow-button-black);
 }
 
 .brand-kicker {
     font-family: var(--font-mono);
     font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
     color: var(--cred-zinc);
     text-transform: uppercase;
     display: flex;
@@ -157,9 +155,9 @@ body {
 .brand-title {
     font-family: var(--font-heading);
     font-size: 1.45rem;
-    font-weight: 700;
-    color: var(--cred-white);
-    letter-spacing: -0.03em;
+    font-weight: 800;
+    color: var(--cred-ink);
+    letter-spacing: -0.04em;
     text-transform: uppercase;
     margin-top: 2px;
 }
@@ -183,9 +181,9 @@ body {
 .pill-label {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.12em;
-    color: var(--cred-chalk);
+    color: var(--cred-ink);
 }
 
 .pip {
@@ -196,12 +194,12 @@ body {
 }
 .pip.pip-live {
     background: var(--cred-emerald);
-    box-shadow: 0 0 10px var(--cred-emerald);
+    box-shadow: 0 0 8px var(--cred-emerald);
 }
 .pip.pip-healthy { background: var(--cred-emerald); }
-.pip.pip-degraded { background: #eab308; }
+.pip.pip-degraded { background: #d97706; }
 .pip.pip-critical { background: var(--cred-crimson); }
-.pip.pip-healing { background: var(--cred-white); }
+.pip.pip-healing { background: #000000; }
 
 .metadata-cluster {
     display: flex;
@@ -220,16 +218,16 @@ body {
 .meta-label {
     font-family: var(--font-mono);
     font-size: 0.58rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.16em;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
 }
 
 .meta-value {
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--cred-white);
+    font-weight: 700;
+    color: var(--cred-ink);
     margin-top: 2px;
 }
 
@@ -238,7 +236,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   STAGE PIPELINE: CRED SIGNATURE EDITORIAL WORKFLOW
+   STAGE PIPELINE: EDITORIAL RUNWAY STEPPER (LIGHT)
    -------------------------------------------------------------------------- */
 .stage-pipeline-panel {
     background: var(--cred-surface);
@@ -264,7 +262,7 @@ body {
 .prefix-tag {
     font-family: var(--font-mono);
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.18em;
     color: var(--cred-gold);
     text-transform: uppercase;
@@ -273,10 +271,10 @@ body {
 .panel-header h2, .panel-header h3 {
     font-family: var(--font-heading);
     font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    color: var(--cred-white);
+    color: var(--cred-ink);
     margin-top: 4px;
 }
 
@@ -285,7 +283,7 @@ body {
     gap: 12px;
 }
 
-/* CRED Iconic Action Buttons */
+/* CRED Inverted Action Buttons: Bold Pitch Black on Chalk */
 .action-btn {
     display: inline-flex;
     align-items: center;
@@ -303,33 +301,33 @@ body {
 }
 
 .primary-btn {
-    background: #ffffff;
-    color: #000000;
-    box-shadow: var(--shadow-button-white);
+    background: #000000;
+    color: #ffffff;
+    box-shadow: var(--shadow-button-black);
 }
 .primary-btn:hover {
-    background: #e4e4e7;
+    background: #27272a;
     transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .outline-btn {
     background: transparent;
     border: 1px solid var(--cred-border-contrast);
-    color: var(--cred-white);
+    color: var(--cred-ink);
 }
 .outline-btn:hover {
-    background: var(--cred-surface-raised);
-    border-color: var(--cred-white);
+    background: var(--cred-recessed);
+    border-color: #000000;
 }
 
 .micro-btn {
     background: var(--cred-recessed);
     border: 1px solid var(--cred-border-subtle);
-    color: var(--cred-zinc);
+    color: var(--cred-charcoal);
     font-family: var(--font-mono);
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.12em;
     padding: 6px 14px;
     border-radius: var(--radius-none);
@@ -338,8 +336,8 @@ body {
 }
 .micro-btn:hover {
     color: #ffffff;
-    border-color: var(--cred-white);
-    background: var(--cred-surface-hover);
+    background: #000000;
+    border-color: #000000;
 }
 
 /* Brutalist Step Flow */
@@ -364,14 +362,14 @@ body {
 }
 
 .stage-tile:hover {
-    background: var(--cred-surface);
-    border-color: var(--cred-border-contrast);
+    background: #ffffff;
+    border-color: var(--cred-border-subtle);
 }
 
 .stage-tile.active {
-    background: var(--cred-surface-raised);
-    border: 1px solid #ffffff;
-    box-shadow: 0 0 24px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: #ffffff;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     transform: translateY(-3px);
 }
 
@@ -382,18 +380,18 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: #ffffff;
+    background: #000000;
 }
 
 .tile-index {
     font-family: var(--font-mono);
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--cred-dark);
+    color: var(--cred-subtle);
     letter-spacing: -0.05em;
 }
 .stage-tile.active .tile-index {
-    color: #ffffff;
+    color: #000000;
 }
 
 .tile-body {
@@ -405,9 +403,9 @@ body {
 .tile-name {
     font-family: var(--font-heading);
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.01em;
-    color: var(--cred-white);
+    color: var(--cred-ink);
     text-transform: uppercase;
 }
 
@@ -424,12 +422,12 @@ body {
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.14em;
-    color: var(--cred-dark);
+    color: var(--cred-zinc);
     text-transform: uppercase;
 }
 
 .stage-tile.active .tile-status {
-    color: #ffffff;
+    color: #000000;
 }
 
 .stage-divider {
@@ -437,15 +435,15 @@ body {
 }
 
 .pipeline-ticker {
-    background: #000000;
-    border: 1px solid var(--cred-border-hairline);
+    background: #ffffff;
+    border: 1px solid var(--cred-border-subtle);
     padding: 12px 18px;
     display: flex;
     align-items: center;
     gap: 12px;
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    box-shadow: var(--shadow-debossed);
+    box-shadow: var(--shadow-plate);
 }
 
 .ticker-prefix {
@@ -455,11 +453,11 @@ body {
 }
 
 .ticker-message {
-    color: var(--cred-platinum);
+    color: var(--cred-charcoal);
 }
 
 /* --------------------------------------------------------------------------
-   WORKSPACE GRID: EDITORIAL TWO-COLUMN ARCHITECTURE
+   WORKSPACE GRID
    -------------------------------------------------------------------------- */
 .workspace-grid {
     display: grid;
@@ -473,7 +471,7 @@ body {
     gap: 24px;
 }
 
-/* Standard Brutalist Panel */
+/* Standard Brutalist Panel (Light) */
 .panel {
     background: var(--cred-surface);
     border: 1px solid var(--cred-border-subtle);
@@ -484,7 +482,7 @@ body {
 .panel .panel-header {
     padding: 16px 24px;
     border-bottom: 1px solid var(--cred-border-hairline);
-    background: rgba(255, 255, 255, 0.01);
+    background: #fafafc;
     margin-bottom: 0;
 }
 
@@ -493,7 +491,7 @@ body {
    -------------------------------------------------------------------------- */
 .graph-viewport {
     height: 460px;
-    background: #000000;
+    background: #fbfbfd;
     position: relative;
     border-bottom: 1px solid var(--cred-border-hairline);
 }
@@ -506,7 +504,7 @@ body {
     font-family: var(--font-mono);
     font-size: 0.75rem;
     letter-spacing: 0.2em;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
 }
 
 .viewport-toolbar {
@@ -565,41 +563,41 @@ body {
 .plate-label {
     font-family: var(--font-mono);
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
     text-transform: uppercase;
 }
 
 .plate-value {
     font-family: var(--font-mono);
     font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--cred-white);
+    font-weight: 800;
+    color: var(--cred-ink);
     margin-top: 4px;
 }
 
 .console-box {
-    background: #000000;
-    border: 1px solid var(--cred-border-hairline);
-    box-shadow: var(--shadow-debossed);
+    background: #111113;
+    border: 1px solid #27272a;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .console-header {
     display: flex;
     justify-content: space-between;
     padding: 10px 16px;
-    background: #08080a;
-    border-bottom: 1px solid var(--cred-border-hairline);
+    background: #1a1a1e;
+    border-bottom: 1px solid #27272a;
     font-family: var(--font-mono);
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
-    color: var(--cred-zinc);
+    color: #a1a1aa;
 }
 
 .console-sub {
-    color: var(--cred-dark);
+    color: #71717a;
 }
 
 .console-output {
@@ -607,13 +605,13 @@ body {
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.6;
-    color: var(--cred-platinum);
+    color: #f4f4f5;
     max-height: 120px;
     overflow-y: auto;
 }
 
 /* --------------------------------------------------------------------------
-   CHAOS ENGINEERING (CRED DEBOSSED TACTILE TILES)
+   CHAOS ENGINEERING (CRED DEBOSSED TACTILE TILES - LIGHT)
    -------------------------------------------------------------------------- */
 .chaos-matrix {
     display: grid;
@@ -634,10 +632,10 @@ body {
 }
 
 .chaos-tile:hover {
-    background: var(--cred-surface-hover);
-    border-color: var(--cred-border-contrast);
+    background: #ffffff;
+    border-color: #000000;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .chaos-tile.danger:hover {
@@ -645,17 +643,17 @@ body {
 }
 
 .chaos-tile.warning:hover {
-    border-color: var(--cred-white);
+    border-color: #000000;
 }
 
 .chaos-tile.reset-tile {
     grid-column: span 2;
-    background: #0e0e12;
+    background: #ffffff;
     border-color: var(--cred-border-subtle);
 }
 .chaos-tile.reset-tile:hover {
-    background: #14141a;
-    border-color: #ffffff;
+    background: #f4f4f6;
+    border-color: #000000;
 }
 
 .tile-top {
@@ -670,7 +668,7 @@ body {
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.16em;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
 }
 
 .scenario-tag {
@@ -685,9 +683,9 @@ body {
 .scenario-title {
     font-family: var(--font-heading);
     font-size: 0.88rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.01em;
-    color: var(--cred-white);
+    color: var(--cred-ink);
     text-transform: uppercase;
 }
 
@@ -699,7 +697,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   GOLDEN SIGNALS PANEL
+   GOLDEN SIGNALS PANEL (LIGHT)
    -------------------------------------------------------------------------- */
 .signals-grid {
     display: grid;
@@ -720,25 +718,25 @@ body {
 .signal-meta {
     font-family: var(--font-mono);
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
     text-transform: uppercase;
 }
 
 .signal-number {
     font-family: var(--font-mono);
     font-size: 1.65rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.04em;
-    color: var(--cred-white);
+    color: var(--cred-ink);
     margin: 6px 0 12px 0;
 }
 
 .signal-number .unit {
     font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--cred-muted);
+    font-weight: 600;
+    color: var(--cred-zinc);
 }
 
 .sparkline-container {
@@ -758,7 +756,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   TABLES: EDITORIAL H&M BRUTALIST RUNWAY CATALOG
+   TABLES: H&M EDITORIAL CATALOG (LIGHT)
    -------------------------------------------------------------------------- */
 .table-frame {
     padding: 6px 24px 20px 24px;
@@ -779,9 +777,9 @@ body {
 .editorial-table th {
     font-family: var(--font-mono);
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.16em;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
     padding: 14px 12px;
     border-bottom: 1px solid var(--cred-border-subtle);
     text-transform: uppercase;
@@ -794,17 +792,17 @@ body {
 }
 
 .editorial-table tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .action-selected {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(0, 0, 0, 0.03);
 }
 
 .prim-title {
     font-family: var(--font-heading);
-    font-weight: 700;
-    color: var(--cred-white);
+    font-weight: 800;
+    color: var(--cred-ink);
     font-size: 0.82rem;
     letter-spacing: -0.01em;
 }
@@ -830,10 +828,11 @@ body {
 .mono-code {
     font-family: var(--font-mono);
     font-size: 0.76rem;
-    color: var(--cred-white);
+    font-weight: 600;
+    color: var(--cred-ink);
 }
 
-/* CRED Minimalist Status Chips */
+/* Status Chips */
 .status-chip {
     display: inline-block;
     font-family: var(--font-mono);
@@ -848,43 +847,43 @@ body {
 
 .status-chip.chip-safe {
     background: var(--cred-emerald-dim);
-    border-color: rgba(0, 230, 118, 0.3);
+    border-color: rgba(21, 128, 61, 0.3);
     color: var(--cred-emerald);
 }
 
 .status-chip.chip-selected {
-    background: #ffffff;
-    color: #000000;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    background: #000000;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .status-chip.chip-breached {
     background: var(--cred-crimson-dim);
-    border-color: rgba(255, 51, 68, 0.3);
+    border-color: rgba(220, 38, 38, 0.3);
     color: var(--cred-crimson);
 }
 
 .status-chip.chip-rejected {
     background: transparent;
     border-color: var(--cred-border-hairline);
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
 }
 
 .status-chip.chip-gold {
     background: var(--cred-gold-dim);
-    border-color: rgba(197, 160, 89, 0.3);
+    border-color: rgba(138, 101, 8, 0.3);
     color: var(--cred-gold);
 }
 
 .status-chip.chip-neutral {
     background: var(--cred-recessed);
     border-color: var(--cred-border-subtle);
-    color: var(--cred-zinc);
+    color: var(--cred-charcoal);
 }
 
 .empty-state {
     text-align: center;
-    color: var(--cred-muted);
+    color: var(--cred-zinc);
     padding: 32px 0;
     font-family: var(--font-mono);
     font-size: 0.72rem;

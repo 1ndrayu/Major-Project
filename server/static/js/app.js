@@ -1,6 +1,6 @@
 /**
  * AIOps Autonomous Self-Healing Ecosystem - Frontend Logic
- * Design System: CRED Luxury Brutalism & H&M High-Fashion Editorial
+ * Design System: CRED Luxury & H&M High-Fashion Editorial (Light Mode)
  * Handles Real-Time WebSockets, Vis.js 100-Service Dynamic Graph,
  * Chart.js Golden Signals, Chaos Injection, and Stepped Pipeline Execution.
  */
@@ -32,19 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------------------------------------
-// 1. Minimalist Editorial Chart.js Initialization
+// 1. Editorial Light Chart.js Initialization
 // -------------------------------------------------------------
 function initCharts() {
-    const editorialOptions = {
+    const editorialLightOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#0a0a0d',
-                titleFont: { family: 'JetBrains Mono', size: 10 },
+                backgroundColor: '#ffffff',
+                titleColor: '#09090b',
+                bodyColor: '#09090b',
+                titleFont: { family: 'JetBrains Mono', size: 10, weight: '700' },
                 bodyFont: { family: 'JetBrains Mono', size: 11 },
-                borderColor: '#22222a',
+                borderColor: '#d1d1d6',
                 borderWidth: 1,
                 padding: 8,
                 cornerRadius: 0,
@@ -55,18 +57,18 @@ function initCharts() {
             x: { display: false },
             y: {
                 display: true,
-                grid: { color: 'rgba(255, 255, 255, 0.03)', drawTicks: false },
+                grid: { color: 'rgba(0, 0, 0, 0.04)', drawTicks: false },
                 ticks: {
-                    color: '#555555',
-                    font: { family: 'JetBrains Mono', size: 8 },
+                    color: '#71717a',
+                    font: { family: 'JetBrains Mono', size: 8, weight: '600' },
                     maxTicksLimit: 3
                 },
                 border: { display: false }
             }
         },
         elements: {
-            point: { radius: 0, hoverRadius: 3, hoverBorderColor: '#ffffff' },
-            line: { tension: 0.25, borderWidth: 1.5 }
+            point: { radius: 0, hoverRadius: 3, hoverBorderColor: '#000000' },
+            line: { tension: 0.25, borderWidth: 1.8 }
         }
     };
 
@@ -77,12 +79,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyP99,
-                borderColor: "#ffffff",
-                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "#000000",
+                backgroundColor: "rgba(0, 0, 0, 0.02)",
                 fill: true
             }]
         },
-        options: editorialOptions
+        options: editorialLightOptions
     });
 
     const ctxError = document.getElementById("chart-error").getContext("2d");
@@ -92,12 +94,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyError,
-                borderColor: "#ff3344",
-                backgroundColor: "rgba(255, 51, 68, 0.02)",
+                borderColor: "#dc2626",
+                backgroundColor: "rgba(220, 38, 38, 0.02)",
                 fill: true
             }]
         },
-        options: editorialOptions
+        options: editorialLightOptions
     });
 
     const ctxPool = document.getElementById("chart-pool").getContext("2d");
@@ -107,12 +109,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyPool,
-                borderColor: "#c5a059",
-                backgroundColor: "rgba(197, 160, 89, 0.02)",
+                borderColor: "#8a6508",
+                backgroundColor: "rgba(138, 101, 8, 0.02)",
                 fill: true
             }]
         },
-        options: editorialOptions
+        options: editorialLightOptions
     });
 
     const ctxRps = document.getElementById("chart-rps").getContext("2d");
@@ -122,12 +124,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyRps,
-                borderColor: "#888888",
-                backgroundColor: "rgba(136, 136, 136, 0.02)",
+                borderColor: "#4b5563",
+                backgroundColor: "rgba(75, 85, 99, 0.02)",
                 fill: true
             }]
         },
-        options: editorialOptions
+        options: editorialLightOptions
     });
 }
 
@@ -152,7 +154,7 @@ function updateChartData(p99, errorRate, poolSat, rps) {
     chartPool.update();
     chartRps.update();
 
-    // Update numbers with monospace formatting
+    // Update numbers with crisp black typography
     document.getElementById("metric-p99").innerHTML = `${p99.toFixed(1)} <span class="unit">ms</span>`;
     document.getElementById("metric-error").innerHTML = `${(errorRate * 100).toFixed(2)} <span class="unit">%</span>`;
     document.getElementById("metric-pool").innerHTML = `${(poolSat * 100).toFixed(1)} <span class="unit">%</span>`;
@@ -160,7 +162,7 @@ function updateChartData(p99, errorRate, poolSat, rps) {
 }
 
 // -------------------------------------------------------------
-// 2. Vis.js Dynamic 100-Microservice Topology Graph
+// 2. Vis.js Dynamic 100-Microservice Topology Graph (Light Mode)
 // -------------------------------------------------------------
 async function loadTopology() {
     try {
@@ -172,22 +174,22 @@ async function loadTopology() {
 
         data.nodes.forEach((n) => {
             nodeLookup[n.id] = n;
-            let bgColor = "#15151c";
-            let borderColor = "#2b2b36";
-            let fontColor = "#aaaaaa";
+            let bgColor = "#ffffff";
+            let borderColor = "#18181b";
+            let fontColor = "#09090b";
 
             if (n.status === "CRITICAL") {
-                bgColor = "#ff3344";
-                borderColor = "#ffffff";
+                bgColor = "#dc2626";
+                borderColor = "#000000";
                 fontColor = "#ffffff";
             } else if (n.status === "DEGRADED") {
-                bgColor = "#4a3510";
-                borderColor = "#c5a059";
-                fontColor = "#ffffff";
+                bgColor = "#fef3c7";
+                borderColor = "#d97706";
+                fontColor = "#92400e";
             } else if (n.status === "SELF_HEALING") {
-                bgColor = "#ffffff";
-                borderColor = "#ffffff";
-                fontColor = "#000000";
+                bgColor = "#000000";
+                borderColor = "#000000";
+                fontColor = "#ffffff";
             }
 
             visNodes.push({
@@ -197,9 +199,9 @@ async function loadTopology() {
                 color: {
                     background: bgColor,
                     border: borderColor,
-                    highlight: { background: "#ffffff", border: "#ffffff" }
+                    highlight: { background: "#000000", border: "#000000" }
                 },
-                font: { color: fontColor, size: 9, face: "Space Grotesk" },
+                font: { color: fontColor, size: 9, face: "Space Grotesk", strokeWidth: 0 },
                 shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
                 size: n.id === "svc-066" ? 22 : 13
             });
@@ -212,7 +214,7 @@ async function loadTopology() {
                 from: e.source,
                 to: e.target,
                 arrows: "to",
-                color: { color: isHighLatency ? "#ff3344" : "#22222a", opacity: isHighLatency ? 0.9 : 0.4 },
+                color: { color: isHighLatency ? "#dc2626" : "#d1d1d6", opacity: isHighLatency ? 0.9 : 0.6 },
                 width: isHighLatency ? 1.8 : 0.8
             });
         });
@@ -225,7 +227,7 @@ async function loadTopology() {
 
         const options = {
             nodes: {
-                borderWidth: 1.2,
+                borderWidth: 1.5,
                 shadow: false
             },
             edges: {
@@ -358,22 +360,22 @@ async function refreshTopologyStatus(activeFaults) {
         data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
             if (networkData.nodes) {
-                let bgColor = "#15151c";
-                let borderColor = "#2b2b36";
-                let fontColor = "#aaaaaa";
+                let bgColor = "#ffffff";
+                let borderColor = "#18181b";
+                let fontColor = "#09090b";
 
                 if (n.status === "CRITICAL") {
-                    bgColor = "#ff3344";
-                    borderColor = "#ffffff";
+                    bgColor = "#dc2626";
+                    borderColor = "#000000";
                     fontColor = "#ffffff";
                 } else if (n.status === "DEGRADED") {
-                    bgColor = "#4a3510";
-                    borderColor = "#c5a059";
-                    fontColor = "#ffffff";
+                    bgColor = "#fef3c7";
+                    borderColor = "#d97706";
+                    fontColor = "#92400e";
                 } else if (n.status === "SELF_HEALING") {
-                    bgColor = "#ffffff";
-                    borderColor = "#ffffff";
-                    fontColor = "#000000";
+                    bgColor = "#000000";
+                    borderColor = "#000000";
+                    fontColor = "#ffffff";
                 }
 
                 networkData.nodes.update({
@@ -406,11 +408,11 @@ function setPipelineStage(stageNum, message) {
         } else if (i === stageNum) {
             card.className = "stage-tile active";
             statusEl.textContent = "EXECUTING";
-            statusEl.style.color = "#ffffff";
+            statusEl.style.color = "#000000";
         } else {
             card.className = "stage-tile";
             statusEl.textContent = "STANDBY";
-            statusEl.style.color = "var(--cred-dark)";
+            statusEl.style.color = "var(--cred-zinc)";
         }
     }
     if (message) {
