@@ -3,29 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>AIOps Autonomous Self-Healing Ecosystem | Production Control Plane</title>
-    <!-- Editorial & Technical Fonts -->
+    <!-- Editorial & Technical Fonts: Space Grotesk & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Vis.js Network Graph CDN -->
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=cred.3.0">
 </head>
 <body>
     <div class="app-layout">
         <!-- Top Navigation: CRED Luxury Minimalist Header -->
         <header class="masthead">
             <div class="masthead-brand">
-                <div class="brand-monogram">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                        <polyline points="2 17 12 22 22 17"></polyline>
-                        <polyline points="2 12 12 17 22 12"></polyline>
-                    </svg>
-                </div>
+                <div class="brand-monogram">CR</div>
                 <div class="brand-titles">
                     <div class="brand-kicker">AUTONOMOUS RESILIENCE ARCHITECTURE // AMITY 2026–27</div>
                     <h1 class="brand-title">Self-Healing Software Ecosystem</h1>
@@ -67,7 +64,7 @@
                 </div>
                 <div class="header-actions">
                     <button class="action-btn outline-btn" id="btn-step-stage" onclick="stepStage()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
                         </svg>
                         <span>STEP PIPELINE</span>
@@ -91,8 +88,6 @@
                     </div>
                 </div>
 
-                <div class="stage-divider"></div>
-
                 <div class="stage-tile" id="step-card-2" data-stage="2">
                     <div class="tile-index">02</div>
                     <div class="tile-body">
@@ -101,8 +96,6 @@
                         <div class="tile-status" id="step-status-2">STANDBY</div>
                     </div>
                 </div>
-
-                <div class="stage-divider"></div>
 
                 <div class="stage-tile" id="step-card-3" data-stage="3">
                     <div class="tile-index">03</div>
@@ -113,8 +106,6 @@
                     </div>
                 </div>
 
-                <div class="stage-divider"></div>
-
                 <div class="stage-tile" id="step-card-4" data-stage="4">
                     <div class="tile-index">04</div>
                     <div class="tile-body">
@@ -124,8 +115,6 @@
                     </div>
                 </div>
 
-                <div class="stage-divider"></div>
-
                 <div class="stage-tile" id="step-card-5" data-stage="5">
                     <div class="tile-index">05</div>
                     <div class="tile-body">
@@ -134,8 +123,6 @@
                         <div class="tile-status" id="step-status-5">STANDBY</div>
                     </div>
                 </div>
-
-                <div class="stage-divider"></div>
 
                 <div class="stage-tile" id="step-card-6" data-stage="6">
                     <div class="tile-index">06</div>
@@ -175,7 +162,7 @@
                         <div class="viewport-loader">INITIALIZING TOPOLOGY FABRIC...</div>
                     </div>
                     <div class="viewport-toolbar">
-                        <span class="toolbar-hint">Select any node to inspect telemetry telemetry vector, ConfigMap, and HikariCP pool metrics.</span>
+                        <span class="toolbar-hint">Select any node to inspect telemetry vector, ConfigMap, and HikariCP pool metrics.</span>
                         <button class="micro-btn" onclick="resetGraphView()">RESET VIEW</button>
                     </div>
                 </div>
@@ -185,9 +172,9 @@
                     <div class="panel-header">
                         <div class="header-prefix">
                             <span class="prefix-tag">// SERVICE INSPECTION</span>
-                            <h3 id="inspector-service-name">Order-DB-Adapter (svc-066)</h3>
+                            <h3 id="inspector-service-name">Order-DB-Adapter [svc-066]</h3>
                         </div>
-                        <span class="status-chip" id="inspector-service-status">HEALTHY</span>
+                        <span class="status-chip chip-safe" id="inspector-service-status">HEALTHY</span>
                     </div>
                     <div class="inspector-content">
                         <div class="telemetry-bar-grid">
@@ -426,6 +413,6 @@
     </div>
 
     <!-- Live Application JavaScript -->
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js?v=cred.3.0"></script>
 </body>
 </html>

@@ -41,13 +41,13 @@ function initCharts() {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#121212',
+                backgroundColor: '#0a0a0d',
                 titleFont: { family: 'JetBrains Mono', size: 10 },
                 bodyFont: { family: 'JetBrains Mono', size: 11 },
-                borderColor: '#27272a',
+                borderColor: '#22222a',
                 borderWidth: 1,
                 padding: 8,
-                cornerRadius: 2,
+                cornerRadius: 0,
                 displayColors: false
             }
         },
@@ -57,7 +57,7 @@ function initCharts() {
                 display: true,
                 grid: { color: 'rgba(255, 255, 255, 0.03)', drawTicks: false },
                 ticks: {
-                    color: '#52525b',
+                    color: '#555555',
                     font: { family: 'JetBrains Mono', size: 8 },
                     maxTicksLimit: 3
                 },
@@ -92,8 +92,8 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyError,
-                borderColor: "#ef4444",
-                backgroundColor: "rgba(239, 68, 68, 0.02)",
+                borderColor: "#ff3344",
+                backgroundColor: "rgba(255, 51, 68, 0.02)",
                 fill: true
             }]
         },
@@ -107,8 +107,8 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyPool,
-                borderColor: "#d4af37",
-                backgroundColor: "rgba(212, 175, 55, 0.02)",
+                borderColor: "#c5a059",
+                backgroundColor: "rgba(197, 160, 89, 0.02)",
                 fill: true
             }]
         },
@@ -122,8 +122,8 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyRps,
-                borderColor: "#a1a1aa",
-                backgroundColor: "rgba(161, 161, 170, 0.02)",
+                borderColor: "#888888",
+                backgroundColor: "rgba(136, 136, 136, 0.02)",
                 fill: true
             }]
         },
@@ -172,18 +172,18 @@ async function loadTopology() {
 
         data.nodes.forEach((n) => {
             nodeLookup[n.id] = n;
-            let bgColor = "#1c1c1f";
-            let borderColor = "#3f3f46";
-            let fontColor = "#a1a1aa";
+            let bgColor = "#15151c";
+            let borderColor = "#2b2b36";
+            let fontColor = "#aaaaaa";
 
             if (n.status === "CRITICAL") {
-                bgColor = "#ef4444";
+                bgColor = "#ff3344";
                 borderColor = "#ffffff";
                 fontColor = "#ffffff";
             } else if (n.status === "DEGRADED") {
-                bgColor = "#713f12";
-                borderColor = "#eab308";
-                fontColor = "#fef08a";
+                bgColor = "#4a3510";
+                borderColor = "#c5a059";
+                fontColor = "#ffffff";
             } else if (n.status === "SELF_HEALING") {
                 bgColor = "#ffffff";
                 borderColor = "#ffffff";
@@ -199,9 +199,9 @@ async function loadTopology() {
                     border: borderColor,
                     highlight: { background: "#ffffff", border: "#ffffff" }
                 },
-                font: { color: fontColor, size: 9, face: "JetBrains Mono" },
+                font: { color: fontColor, size: 9, face: "Space Grotesk" },
                 shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
-                size: n.id === "svc-066" ? 20 : 12
+                size: n.id === "svc-066" ? 22 : 13
             });
         });
 
@@ -212,7 +212,7 @@ async function loadTopology() {
                 from: e.source,
                 to: e.target,
                 arrows: "to",
-                color: { color: isHighLatency ? "#ef4444" : "#27272a", opacity: isHighLatency ? 0.9 : 0.4 },
+                color: { color: isHighLatency ? "#ff3344" : "#22222a", opacity: isHighLatency ? 0.9 : 0.4 },
                 width: isHighLatency ? 1.8 : 0.8
             });
         });
@@ -232,13 +232,17 @@ async function loadTopology() {
                 smooth: { type: "continuous" }
             },
             physics: {
-                stabilization: { iterations: 100 },
-                barnesHut: { gravitationalConstant: -3200, centralGravity: 0.28, springLength: 70 }
+                stabilization: { iterations: 120 },
+                barnesHut: { gravitationalConstant: -3600, centralGravity: 0.28, springLength: 75 }
             },
             interaction: { hover: true, tooltipDelay: 200 }
         };
 
         network = new vis.Network(container, networkData, options);
+
+        network.once('stabilizationIterationsDone', function() {
+            network.fit({ animation: { duration: 600, easingFunction: "easeInOutQuad" } });
+        });
 
         network.on("click", (params) => {
             if (params.nodes.length > 0) {
@@ -354,18 +358,18 @@ async function refreshTopologyStatus(activeFaults) {
         data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
             if (networkData.nodes) {
-                let bgColor = "#1c1c1f";
-                let borderColor = "#3f3f46";
-                let fontColor = "#a1a1aa";
+                let bgColor = "#15151c";
+                let borderColor = "#2b2b36";
+                let fontColor = "#aaaaaa";
 
                 if (n.status === "CRITICAL") {
-                    bgColor = "#ef4444";
+                    bgColor = "#ff3344";
                     borderColor = "#ffffff";
                     fontColor = "#ffffff";
                 } else if (n.status === "DEGRADED") {
-                    bgColor = "#713f12";
-                    borderColor = "#eab308";
-                    fontColor = "#fef08a";
+                    bgColor = "#4a3510";
+                    borderColor = "#c5a059";
+                    fontColor = "#ffffff";
                 } else if (n.status === "SELF_HEALING") {
                     bgColor = "#ffffff";
                     borderColor = "#ffffff";
@@ -398,7 +402,7 @@ function setPipelineStage(stageNum, message) {
         if (i < stageNum) {
             card.className = "stage-tile";
             statusEl.textContent = "VERIFIED";
-            statusEl.style.color = "var(--accent-emerald)";
+            statusEl.style.color = "var(--cred-emerald)";
         } else if (i === stageNum) {
             card.className = "stage-tile active";
             statusEl.textContent = "EXECUTING";
@@ -406,7 +410,7 @@ function setPipelineStage(stageNum, message) {
         } else {
             card.className = "stage-tile";
             statusEl.textContent = "STANDBY";
-            statusEl.style.color = "var(--text-subtle)";
+            statusEl.style.color = "var(--cred-dark)";
         }
     }
     if (message) {
@@ -500,7 +504,7 @@ async function refreshLedger() {
         tbody.innerHTML = data.incidents.map(inc => `
             <tr>
                 <td><span class="mono-code">${inc.incident_id}</span></td>
-                <td><strong style="color:var(--accent-crimson)">${inc.culprit_service}</strong></td>
+                <td><strong style="color:var(--cred-crimson)">${inc.culprit_service}</strong></td>
                 <td><span class="status-chip chip-gold">94.0%</span></td>
                 <td><span class="mono-code">${inc.remediation_action}</span></td>
                 <td><span class="mono-code">${inc.mttd_sec}s</span></td>

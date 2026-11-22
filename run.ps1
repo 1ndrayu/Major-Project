@@ -9,4 +9,4 @@ Write-Host "[*] Starting FastAPI Live Control Plane on http://127.0.0.1:8000" -F
 Write-Host "[*] Open your browser and navigate to http://127.0.0.1:8000 to interact with the live system." -ForegroundColor White
 Write-Host ""
 
-python -m uvicorn server.main:app --host 127.0.0.1 --port 8000
+python -m uvicorn server.main:app --host 127.0.0.1 --port 8000 --reload
