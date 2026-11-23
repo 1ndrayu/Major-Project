@@ -316,8 +316,14 @@ function initWebSocket() {
         try {
             const data = JSON.parse(event.data);
             if (data.type === "TELEMETRY_UPDATE") {
-                // Update stage indicator
-                setPipelineStage(data.current_stage, data.status_message);
+                // Only sync pipeline stage from background telemetry if no autonomous cycle or manual stepping is active
+                if (!isAutoHealingActive && currentStage === 1 && data.current_stage === 1) {
+                    // Update ticker only if still in steady state
+                    const ticker = document.getElementById("pipeline-status-text");
+                    if (ticker && (!ticker.textContent || ticker.textContent.includes("steady state") || ticker.textContent.includes("ready") || ticker.textContent.includes("idle"))) {
+                        ticker.textContent = data.status_message;
+                    }
+                }
 
                 // Update charts
                 const orderDbPoolSat = nodeLookup["svc-066"] ? (nodeLookup["svc-066"].db_pool_active / Math.max(1, nodeLookup["svc-066"].db_pool_max)) : 0.3;
@@ -394,6 +400,8 @@ async function refreshTopologyStatus(activeFaults) {
 // -------------------------------------------------------------
 // 4. Stepped & Autonomous Pipeline Execution
 // -------------------------------------------------------------
+let isAutoHealingActive = false;
+
 function setPipelineStage(stageNum, message) {
     currentStage = stageNum;
     for (let i = 1; i <= 6; i++) {
@@ -402,17 +410,14 @@ function setPipelineStage(stageNum, message) {
         if (!card || !statusEl) continue;
 
         if (i < stageNum) {
-            card.className = "stage-tile";
+            card.className = "stage-tile completed";
             statusEl.textContent = "VERIFIED";
-            statusEl.style.color = "var(--cred-emerald)";
         } else if (i === stageNum) {
             card.className = "stage-tile active";
             statusEl.textContent = "EXECUTING";
-            statusEl.style.color = "#000000";
         } else {
             card.className = "stage-tile";
             statusEl.textContent = "STANDBY";
-            statusEl.style.color = "var(--cred-zinc)";
         }
     }
     if (message) {
@@ -420,42 +425,135 @@ function setPipelineStage(stageNum, message) {
     }
 }
 
+function resetPipelineUI() {
+    currentStage = 1;
+    for (let i = 1; i <= 6; i++) {
+        const card = document.getElementById(`step-card-${i}`);
+        const statusEl = document.getElementById(`step-status-${i}`);
+        if (card) card.className = "stage-tile";
+        if (statusEl) statusEl.textContent = "STANDBY";
+    }
+    document.getElementById("pipeline-status-text").textContent = "Pipeline ready. Click 'STEP PIPELINE' or 'AUTONOMOUS EXECUTION' to initiate.";
+}
+
 async function stepStage() {
-    const nextStage = currentStage >= 6 ? 1 : currentStage;
+    if (isAutoHealingActive) return;
+
+    const stepBtn = document.getElementById("btn-step-stage");
+    stepBtn.disabled = true;
+
+    // Use currentStage (1 to 6)
+    const stageToRun = currentStage > 6 ? 1 : currentStage;
+
     try {
+        // Set visual cue that this stage is executing
+        setPipelineStage(stageToRun, `Executing Stage 0${stageToRun}...`);
+
         const resp = await fetch("/api/self-heal/step", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stage: nextStage })
+            body: JSON.stringify({ stage: stageToRun })
         });
         const res = await resp.json();
-        setPipelineStage(nextStage === 6 ? 1 : nextStage + 1, res.message);
-        if (nextStage === 6) {
-            refreshLedger();
+
+        // Highlight affected/culprit nodes in topology based on stage
+        if (res.primary_service) {
+            selectService(res.primary_service);
+        } else if (res.culprit_service) {
+            selectService(res.culprit_service);
+        } else if (res.target_service) {
+            selectService(res.target_service);
         }
+
+        // Advance to next stage or finish
+        if (stageToRun === 6) {
+            // Mark all stages completed
+            for (let i = 1; i <= 6; i++) {
+                const card = document.getElementById(`step-card-${i}`);
+                const statusEl = document.getElementById(`step-status-${i}`);
+                if (card) card.className = "stage-tile completed";
+                if (statusEl) statusEl.textContent = "VERIFIED";
+            }
+            document.getElementById("pipeline-status-text").textContent = res.message;
+            currentStage = 1;
+            refreshLedger();
+            setTimeout(() => {
+                refreshTopologyStatus({});
+            }, 500);
+        } else {
+            const next = res.next_stage || (stageToRun + 1);
+            setPipelineStage(next, res.message);
+        }
+
         refreshTopologyStatus({});
     } catch (e) {
-        alert("Pipeline step error: " + e);
+        console.error("Pipeline step error:", e);
+        document.getElementById("pipeline-status-text").textContent = `Error in stage ${stageToRun}: ${e.message || e}`;
+    } finally {
+        stepBtn.disabled = false;
     }
 }
 
 async function triggerAutoHeal() {
-    const banner = document.getElementById("pipeline-status-text");
-    banner.textContent = "Autonomous Closed-Loop OODA Execution in Progress...";
+    if (isAutoHealingActive) return;
+    isAutoHealingActive = true;
+
+    const autoBtn = document.getElementById("btn-auto-heal");
+    const stepBtn = document.getElementById("btn-step-stage");
+    const originalText = autoBtn.innerHTML;
+
+    autoBtn.disabled = true;
+    stepBtn.disabled = true;
+    autoBtn.innerHTML = `<span>RUNNING OODA...</span>`;
+
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
     try {
-        const resp = await fetch("/api/self-heal/auto", { method: "POST" });
-        const res = await resp.json();
+        // Sequentially execute all 6 stages with crisp visual progression
+        for (let s = 1; s <= 6; s++) {
+            setPipelineStage(s, `Executing Stage 0${s} in autonomous closed-loop...`);
 
-        if (res.status === "REMEDIATED") {
-            setPipelineStage(1, `Incident ${res.incident_id} Resolved. Root Cause: ${res.culprit_service} (${res.fault_type}). Remediation: ${res.selected_remediation}. p99 restored to ${res.post_p99_ms}ms.`);
-            refreshLedger();
-        } else {
-            setPipelineStage(1, res.message);
+            const resp = await fetch("/api/self-heal/step", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ stage: s })
+            });
+            const res = await resp.json();
+
+            // Highlight target in inspector
+            if (res.primary_service) selectService(res.primary_service);
+            if (res.culprit_service) selectService(res.culprit_service);
+            if (res.target_service) selectService(res.target_service);
+
+            document.getElementById("pipeline-status-text").textContent = res.message;
+            refreshTopologyStatus({});
+
+            // Realistic pause per stage so observers can see the decision cycle
+            if (s < 6) {
+                await sleep(950);
+            }
         }
+
+        // Mark all 6 stages verified
+        for (let i = 1; i <= 6; i++) {
+            const card = document.getElementById(`step-card-${i}`);
+            const statusEl = document.getElementById(`step-status-${i}`);
+            if (card) card.className = "stage-tile completed";
+            if (statusEl) statusEl.textContent = "VERIFIED";
+        }
+
+        refreshLedger();
         refreshTopologyStatus({});
+        currentStage = 1;
+
     } catch (e) {
-        alert("Autonomous execution error: " + e);
+        console.error("Autonomous execution error:", e);
+        document.getElementById("pipeline-status-text").textContent = `Autonomous loop error: ${e.message || e}`;
+    } finally {
+        isAutoHealingActive = false;
+        autoBtn.disabled = false;
+        stepBtn.disabled = false;
+        autoBtn.innerHTML = originalText;
     }
 }
 

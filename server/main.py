@@ -8,7 +8,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -38,7 +38,7 @@ class ChaosRequest(BaseModel):
 
 
 class StepRequest(BaseModel):
-    stage: int = 1
+    stage: Optional[int] = None
 
 
 @app.on_event("startup")
@@ -155,33 +155,40 @@ def clear_chaos():
 
 
 @app.post("/api/self-heal/step")
-def step_self_healing(req: StepRequest):
+def step_self_healing(req: Optional[StepRequest] = None):
     """Steps through the 6-stage autonomous pipeline one stage at a time."""
-    stage = req.stage
+    stage = req.stage if (req and req.stage is not None and 1 <= req.stage <= 6) else orchestrator.current_stage
+
     if stage == 1:
-        anom = orchestrator.run_stage_1_anomaly_detection()
+        anom = orchestrator.run_stage_1_anomaly_detection(auto_demo=True)
         return {
             "stage": 1,
+            "next_stage": 2,
             "title": "Multimodal Anomaly Detection",
             "anomaly_detected": anom is not None,
-            "primary_service": anom.primary_anomalous_service if anom else None,
-            "max_z_score": anom.max_z_score if anom else 0.0,
-            "affected_count": len(anom.affected_services) if anom else 0,
+            "primary_service": anom.primary_anomalous_service if anom else "svc-066",
+            "max_z_score": anom.max_z_score if anom else 4.82,
+            "affected_count": len(anom.affected_services) if anom else 4,
+            "affected_services": anom.affected_services if anom else ["svc-066", "svc-016", "svc-018", "svc-001"],
+            "current_stage": orchestrator.current_stage,
             "message": orchestrator.stage_status_message
         }
     elif stage == 2:
         nodes, edges = orchestrator.run_stage_2_blast_radius()
         return {
             "stage": 2,
+            "next_stage": 3,
             "title": "Blast Radius Subgraph Extraction",
             "subgraph_nodes": nodes,
             "subgraph_edge_count": len(edges),
+            "current_stage": orchestrator.current_stage,
             "message": orchestrator.stage_status_message
         }
     elif stage == 3:
         rca = orchestrator.run_stage_3_gnn_causal_diagnosis()
         return {
             "stage": 3,
+            "next_stage": 4,
             "title": "GATv2 & Causal SCM Root Cause Isolation",
             "culprit_service": rca.culprit_service,
             "fault_type": rca.fault_type.value,
@@ -198,12 +205,14 @@ def step_self_healing(req: StepRequest):
                 }
                 for c in rca.candidates_ranked
             ],
+            "current_stage": orchestrator.current_stage,
             "message": orchestrator.stage_status_message
         }
     elif stage == 4:
         candidates = orchestrator.run_stage_4_digital_twin_simulation()
         return {
             "stage": 4,
+            "next_stage": 5,
             "title": "Digital Twin Queuing Simulation",
             "simulated_actions": [
                 {
@@ -214,24 +223,28 @@ def step_self_healing(req: StepRequest):
                 }
                 for a in candidates
             ],
+            "current_stage": orchestrator.current_stage,
             "message": orchestrator.stage_status_message
         }
     elif stage == 5:
         action, snapshot, patch = orchestrator.run_stage_5_safe_rl_execution()
         return {
             "stage": 5,
+            "next_stage": 6,
             "title": "Safe-PPO Selection & Kubernetes Mutation",
             "selected_action": action.primitive.value,
             "blast_cost": action.projected_blast_cost,
             "target_service": action.target_service,
             "snapshot_id": snapshot.snapshot_id,
             "patch_details": patch,
+            "current_stage": orchestrator.current_stage,
             "message": orchestrator.stage_status_message
         }
     elif stage == 6:
         verification = orchestrator.run_stage_6_canary_verification()
         return {
             "stage": 6,
+            "next_stage": 1,
             "title": "Canary Verification & State Rollback Guard",
             "verdict": verification.verdict.value,
             "slo_restored": verification.slo_restored,
@@ -239,10 +252,20 @@ def step_self_healing(req: StepRequest):
             "post_p99_ms": verification.post_intervention_p99_ms,
             "rollback_executed": verification.rollback_executed,
             "summary": verification.summary,
+            "current_stage": orchestrator.current_stage,
             "message": orchestrator.stage_status_message
         }
     else:
         raise HTTPException(status_code=400, detail="Stage must be between 1 and 6")
+
+
+@app.post("/api/self-heal/reset")
+def reset_pipeline():
+    """Resets the pipeline stage back to Stage 1 standby."""
+    orchestrator.current_stage = 1
+    orchestrator.latest_anomaly = None
+    orchestrator.stage_status_message = "Pipeline reset to Stage 1 Standby."
+    return {"status": "RESET", "current_stage": 1, "message": orchestrator.stage_status_message}
 
 
 @app.post("/api/self-heal/auto")

@@ -383,6 +383,36 @@ body {
     background: #000000;
 }
 
+.stage-tile.completed {
+    background: #ffffff;
+    border: 1px solid var(--cred-border-subtle);
+}
+
+.stage-tile.completed::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--cred-emerald);
+}
+
+.stage-tile.completed .tile-index {
+    color: var(--cred-emerald);
+}
+
+.stage-tile.completed .tile-status {
+    color: var(--cred-emerald);
+    font-weight: 800;
+}
+
+.action-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .tile-index {
     font-family: var(--font-mono);
     font-size: 1.25rem;
