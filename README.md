@@ -139,11 +139,6 @@ Checkout Cascading Retry Storm   | svc-016  | svc-016  | PASS       | HORIZONTAL
 ===============================================================================================
 Summary: RCA Accuracy = 100.0% | Mean MTTR = 12.8s | All Canary Probes Verified.
 ```
-
----
-
-## 🧪 Automated Unit & Integration Tests
-
 The project includes an extensive test suite verifying every pillar:
 ```bash
 python -m unittest discover tests/
@@ -195,13 +190,3 @@ Major Project/
 ├── README.md                   # System Architecture & Documentation
 └── MAJOR_PROJECT_REPORT.md     # Full Academic Major Project Report
 ```
-
----
-
-## 🎓 Academic Credentials
-
-- **Degree:** Bachelor of Technology (B.Tech) in Computer Science & Engineering
-- **University:** Amity University Maharashtra (ASET)
-- **Academic Year:** 2026–2027
-- **Project Title:** *Self-Healing Software Ecosystem: An AI System That Detects, Diagnoses and Repairs Software Failures*
-- **Candidate:** Indrayu Nilesh Sandbhor (`A70405223053`)

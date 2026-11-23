@@ -1,41 +1,55 @@
 /* ==========================================================================
-   CRED LUXURY & H&M HIGH-FASHION EDITORIAL DESIGN SYSTEM (LIGHT MODE)
-   Architectural Paper Canvas • Pristine Stark White • Pitch Black Ink
-   Surgical Monochrome • Debossed Tactile Plates • Zero AI-Slop
+   AIOps AUTONOMOUS CONTROL PLANE DESIGN SYSTEM
+   High-Contrast Technical Palette: Deep Black • Vivid Orange • Electric Blue
+   Brutalist Grid • Surgical Typography • Zero Slop
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Pure Monochromatic Light Canvas */
-    --cred-canvas: #f5f5f7;
-    --cred-surface: #ffffff;
-    --cred-surface-raised: #ffffff;
-    --cred-surface-hover: #fafafa;
-    --cred-recessed: #eeeeee;
+    /* 1. Deep Onyx Black & Charcoal Base Hierarchy */
+    --cred-canvas: #090a0f;
+    --cred-surface: #101217;
+    --cred-surface-raised: #151820;
+    --cred-surface-hover: #1c202c;
+    --cred-recessed: #0c0d12;
 
-    /* Architectural Hairline Borders */
-    --cred-border-hairline: #e5e5ea;
-    --cred-border-subtle: #d1d1d6;
-    --cred-border-contrast: #18181b;
+    /* 2. Hairline Structural Borders */
+    --cred-border-hairline: #1c202a;
+    --cred-border-subtle: #282e3d;
+    --cred-border-contrast: #3b4459;
     --cred-border-black: #000000;
 
-    /* High-Fashion Editorial Typography (Ink on Paper) */
+    /* 3. High-Contrast Typography */
     --cred-black: #000000;
-    --cred-ink: #09090b;
-    --cred-charcoal: #18181b;
-    --cred-graphite: #3f3f46;
-    --cred-zinc: #71717a;
-    --cred-muted: #8e8e93;
-    --cred-subtle: #a1a1aa;
+    --cred-ink: #ffffff;
+    --cred-charcoal: #e2e8f0;
+    --cred-graphite: #cbd5e1;
+    --cred-zinc: #94a3b8;
+    --cred-muted: #64748b;
+    --cred-subtle: #475569;
 
-    /* Luxury Precision Accents (Calibrated for High Contrast on Light Canvas) */
-    --cred-gold: #8a6508;
-    --cred-gold-dim: rgba(138, 101, 8, 0.08);
-    --cred-crimson: #dc2626;
-    --cred-crimson-dim: rgba(220, 38, 38, 0.08);
-    --cred-emerald: #15803d;
-    --cred-emerald-dim: rgba(21, 128, 61, 0.08);
+    /* 4. Vivid Orange Accents (Primary Focus, Actions, Alerts, Culprit) */
+    --accent-orange: #ff6b00;
+    --accent-orange-bright: #ff8533;
+    --accent-orange-deep: #e05d00;
+    --accent-orange-dim: rgba(255, 107, 0, 0.12);
+    --accent-orange-glow: 0 0 16px rgba(255, 107, 0, 0.35);
+
+    /* 5. Electric Blue Accents (Telemetry, Verified, Connectivity, Topology) */
+    --accent-blue: #0ea5e9;
+    --accent-blue-bright: #38bdf8;
+    --accent-blue-deep: #0284c7;
+    --accent-blue-dim: rgba(14, 165, 233, 0.12);
+    --accent-blue-glow: 0 0 16px rgba(14, 165, 233, 0.35);
+
+    /* Auxiliary Semantics */
+    --cred-gold: #ff8533;
+    --cred-gold-dim: rgba(255, 133, 51, 0.15);
+    --cred-crimson: #ff3b00;
+    --cred-crimson-dim: rgba(255, 59, 0, 0.15);
+    --cred-emerald: #0ea5e9;
+    --cred-emerald-dim: rgba(14, 165, 233, 0.15);
 
     /* Fonts */
     --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -47,10 +61,11 @@
     --radius-sharp: 1px;
     --radius-subtle: 2px;
 
-    /* Tactile Debossed & Elevated Light Shadows */
-    --shadow-debossed: inset 1px 1px 3px rgba(0, 0, 0, 0.05), inset -1px -1px 2px rgba(255, 255, 255, 0.8);
-    --shadow-plate: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
-    --shadow-button-black: 0 4px 16px rgba(0, 0, 0, 0.16);
+    /* Technical Shadows */
+    --shadow-debossed: inset 1px 1px 3px rgba(0, 0, 0, 0.6), inset -1px -1px 2px rgba(255, 255, 255, 0.03);
+    --shadow-plate: 0 4px 24px -2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-button-orange: 0 4px 18px rgba(255, 107, 0, 0.35);
+    --shadow-button-black: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Base Reset */
@@ -71,8 +86,8 @@ body {
     letter-spacing: -0.01em;
     overflow-x: hidden;
     background-image: 
-        linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     background-size: 32px 32px;
 }
 
@@ -107,7 +122,7 @@ body {
     left: 20px;
     right: 20px;
     height: 2px;
-    background: var(--cred-black);
+    background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
 }
 
 .masthead-brand {
@@ -119,8 +134,8 @@ body {
 .brand-monogram {
     width: 44px;
     height: 44px;
-    background: #000000;
-    color: #ffffff;
+    background: var(--accent-orange);
+    color: #000000;
     border-radius: var(--radius-none);
     display: flex;
     align-items: center;
@@ -129,7 +144,7 @@ body {
     font-weight: 800;
     font-size: 1.15rem;
     letter-spacing: -0.05em;
-    box-shadow: var(--shadow-button-black);
+    box-shadow: var(--shadow-button-orange);
 }
 
 .brand-kicker {
@@ -149,7 +164,8 @@ body {
     display: inline-block;
     width: 6px;
     height: 6px;
-    background: var(--cred-gold);
+    background: var(--accent-blue);
+    box-shadow: 0 0 6px var(--accent-blue);
 }
 
 .brand-title {
@@ -193,13 +209,13 @@ body {
     border-radius: var(--radius-none);
 }
 .pip.pip-live {
-    background: var(--cred-emerald);
-    box-shadow: 0 0 8px var(--cred-emerald);
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px var(--accent-blue);
 }
-.pip.pip-healthy { background: var(--cred-emerald); }
-.pip.pip-degraded { background: #d97706; }
-.pip.pip-critical { background: var(--cred-crimson); }
-.pip.pip-healing { background: #000000; }
+.pip.pip-healthy { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
+.pip.pip-degraded { background: var(--accent-orange-bright); box-shadow: 0 0 6px var(--accent-orange-bright); }
+.pip.pip-critical { background: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
+.pip.pip-healing { background: var(--accent-blue-bright); box-shadow: 0 0 8px var(--accent-blue-bright); }
 
 .metadata-cluster {
     display: flex;
@@ -232,11 +248,11 @@ body {
 }
 
 .meta-item.author-tag .meta-value {
-    color: var(--cred-gold);
+    color: var(--accent-orange-bright);
 }
 
 /* --------------------------------------------------------------------------
-   STAGE PIPELINE: EDITORIAL RUNWAY STEPPER (LIGHT)
+   STAGE PIPELINE: EDITORIAL RUNWAY STEPPER
    -------------------------------------------------------------------------- */
 .stage-pipeline-panel {
     background: var(--cred-surface);
@@ -264,7 +280,7 @@ body {
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.18em;
-    color: var(--cred-gold);
+    color: var(--accent-orange);
     text-transform: uppercase;
 }
 
@@ -283,7 +299,7 @@ body {
     gap: 12px;
 }
 
-/* CRED Inverted Action Buttons: Bold Pitch Black on Chalk */
+/* Inverted Action Buttons: Orange & Blue Accents */
 .action-btn {
     display: inline-flex;
     align-items: center;
@@ -301,14 +317,15 @@ body {
 }
 
 .primary-btn {
-    background: #000000;
-    color: #ffffff;
-    box-shadow: var(--shadow-button-black);
+    background: var(--accent-orange);
+    color: #000000;
+    font-weight: 800;
+    box-shadow: var(--shadow-button-orange);
 }
 .primary-btn:hover {
-    background: #27272a;
+    background: var(--accent-orange-bright);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 24px rgba(255, 107, 0, 0.45);
 }
 
 .outline-btn {
@@ -317,8 +334,9 @@ body {
     color: var(--cred-ink);
 }
 .outline-btn:hover {
-    background: var(--cred-recessed);
-    border-color: #000000;
+    background: var(--accent-blue-dim);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue-bright);
 }
 
 .micro-btn {
@@ -335,9 +353,9 @@ body {
     transition: all 0.15s ease;
 }
 .micro-btn:hover {
-    color: #ffffff;
-    background: #000000;
-    border-color: #000000;
+    color: #000000;
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
 }
 
 /* Brutalist Step Flow */
@@ -362,14 +380,14 @@ body {
 }
 
 .stage-tile:hover {
-    background: #ffffff;
+    background: var(--cred-surface-raised);
     border-color: var(--cred-border-subtle);
 }
 
 .stage-tile.active {
-    background: #ffffff;
-    border: 1px solid #000000;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    background: var(--cred-surface-raised);
+    border: 1px solid var(--accent-orange);
+    box-shadow: 0 4px 20px rgba(255, 107, 0, 0.2);
     transform: translateY(-3px);
 }
 
@@ -380,11 +398,21 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: #000000;
+    background: var(--accent-orange);
+    box-shadow: 0 0 8px var(--accent-orange);
+}
+
+.stage-tile.active .tile-index {
+    color: var(--accent-orange);
+}
+
+.stage-tile.active .tile-status {
+    color: var(--accent-orange);
+    font-weight: 800;
 }
 
 .stage-tile.completed {
-    background: #ffffff;
+    background: var(--cred-surface);
     border: 1px solid var(--cred-border-subtle);
 }
 
@@ -395,15 +423,16 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: var(--cred-emerald);
+    background: var(--accent-blue);
+    box-shadow: 0 0 8px var(--accent-blue);
 }
 
 .stage-tile.completed .tile-index {
-    color: var(--cred-emerald);
+    color: var(--accent-blue);
 }
 
 .stage-tile.completed .tile-status {
-    color: var(--cred-emerald);
+    color: var(--accent-blue-bright);
     font-weight: 800;
 }
 
@@ -419,9 +448,6 @@ body {
     font-weight: 700;
     color: var(--cred-subtle);
     letter-spacing: -0.05em;
-}
-.stage-tile.active .tile-index {
-    color: #000000;
 }
 
 .tile-body {
@@ -456,17 +482,9 @@ body {
     text-transform: uppercase;
 }
 
-.stage-tile.active .tile-status {
-    color: #000000;
-}
-
-.stage-divider {
-    display: none;
-}
-
 .pipeline-ticker {
-    background: #ffffff;
-    border: 1px solid var(--cred-border-subtle);
+    background: var(--cred-surface);
+    border: 1px solid var(--cred-border-hairline);
     padding: 12px 18px;
     display: flex;
     align-items: center;
@@ -477,7 +495,7 @@ body {
 }
 
 .ticker-prefix {
-    color: var(--cred-gold);
+    color: var(--accent-orange);
     font-weight: 700;
     letter-spacing: 0.1em;
 }
@@ -501,7 +519,7 @@ body {
     gap: 24px;
 }
 
-/* Standard Brutalist Panel (Light) */
+/* Standard Brutalist Panel */
 .panel {
     background: var(--cred-surface);
     border: 1px solid var(--cred-border-subtle);
@@ -512,7 +530,7 @@ body {
 .panel .panel-header {
     padding: 16px 24px;
     border-bottom: 1px solid var(--cred-border-hairline);
-    background: #fafafc;
+    background: var(--cred-surface-raised);
     margin-bottom: 0;
 }
 
@@ -521,7 +539,7 @@ body {
    -------------------------------------------------------------------------- */
 .graph-viewport {
     height: 460px;
-    background: #fbfbfd;
+    background: #090a0f;
     position: relative;
     border-bottom: 1px solid var(--cred-border-hairline);
 }
@@ -608,26 +626,26 @@ body {
 }
 
 .console-box {
-    background: #111113;
-    border: 1px solid #27272a;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background: #090a0e;
+    border: 1px solid var(--cred-border-hairline);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .console-header {
     display: flex;
     justify-content: space-between;
     padding: 10px 16px;
-    background: #1a1a1e;
-    border-bottom: 1px solid #27272a;
+    background: #11131a;
+    border-bottom: 1px solid var(--cred-border-hairline);
     font-family: var(--font-mono);
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.14em;
-    color: #a1a1aa;
+    color: var(--accent-blue-bright);
 }
 
 .console-sub {
-    color: #71717a;
+    color: var(--cred-zinc);
 }
 
 .console-output {
@@ -635,13 +653,13 @@ body {
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.6;
-    color: #f4f4f5;
+    color: #e2e8f0;
     max-height: 120px;
     overflow-y: auto;
 }
 
 /* --------------------------------------------------------------------------
-   CHAOS ENGINEERING (CRED DEBOSSED TACTILE TILES - LIGHT)
+   CHAOS ENGINEERING (TACTILE TILES)
    -------------------------------------------------------------------------- */
 .chaos-matrix {
     display: grid;
@@ -662,28 +680,29 @@ body {
 }
 
 .chaos-tile:hover {
-    background: #ffffff;
-    border-color: #000000;
+    background: var(--cred-surface-raised);
+    border-color: var(--accent-orange);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.25);
 }
 
 .chaos-tile.danger:hover {
-    border-color: var(--cred-crimson);
+    border-color: var(--accent-orange);
 }
 
 .chaos-tile.warning:hover {
-    border-color: #000000;
+    border-color: var(--accent-orange-bright);
 }
 
 .chaos-tile.reset-tile {
     grid-column: span 2;
-    background: #ffffff;
+    background: var(--cred-surface);
     border-color: var(--cred-border-subtle);
 }
 .chaos-tile.reset-tile:hover {
-    background: #f4f4f6;
-    border-color: #000000;
+    background: var(--accent-blue-dim);
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 18px rgba(14, 165, 233, 0.25);
 }
 
 .tile-top {
@@ -706,7 +725,7 @@ body {
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.14em;
-    color: var(--cred-gold);
+    color: var(--accent-orange);
     text-transform: uppercase;
 }
 
@@ -727,7 +746,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   GOLDEN SIGNALS PANEL (LIGHT)
+   GOLDEN SIGNALS PANEL
    -------------------------------------------------------------------------- */
 .signals-grid {
     display: grid;
@@ -782,11 +801,11 @@ body {
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.14em;
-    color: var(--cred-emerald);
+    color: var(--accent-blue-bright);
 }
 
 /* --------------------------------------------------------------------------
-   TABLES: H&M EDITORIAL CATALOG (LIGHT)
+   TABLES: EDITORIAL CATALOG
    -------------------------------------------------------------------------- */
 .table-frame {
     padding: 6px 24px 20px 24px;
@@ -822,11 +841,11 @@ body {
 }
 
 .editorial-table tr:hover {
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(14, 165, 233, 0.05);
 }
 
 .action-selected {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(255, 107, 0, 0.1);
 }
 
 .prim-title {
@@ -847,7 +866,7 @@ body {
 .val-positive {
     font-family: var(--font-mono);
     font-weight: 700;
-    color: var(--cred-emerald);
+    color: var(--accent-blue-bright);
 }
 
 .val-muted {
@@ -859,7 +878,7 @@ body {
     font-family: var(--font-mono);
     font-size: 0.76rem;
     font-weight: 600;
-    color: var(--cred-ink);
+    color: var(--accent-blue-bright);
 }
 
 /* Status Chips */
@@ -876,21 +895,22 @@ body {
 }
 
 .status-chip.chip-safe {
-    background: var(--cred-emerald-dim);
-    border-color: rgba(21, 128, 61, 0.3);
-    color: var(--cred-emerald);
+    background: var(--accent-blue-dim);
+    border-color: rgba(14, 165, 233, 0.4);
+    color: var(--accent-blue-bright);
 }
 
 .status-chip.chip-selected {
-    background: #000000;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: var(--accent-orange);
+    color: #000000;
+    font-weight: 800;
+    box-shadow: 0 2px 10px rgba(255, 107, 0, 0.4);
 }
 
 .status-chip.chip-breached {
-    background: var(--cred-crimson-dim);
-    border-color: rgba(220, 38, 38, 0.3);
-    color: var(--cred-crimson);
+    background: var(--accent-orange-dim);
+    border-color: rgba(255, 107, 0, 0.5);
+    color: var(--accent-orange);
 }
 
 .status-chip.chip-rejected {
@@ -900,9 +920,9 @@ body {
 }
 
 .status-chip.chip-gold {
-    background: var(--cred-gold-dim);
-    border-color: rgba(138, 101, 8, 0.3);
-    color: var(--cred-gold);
+    background: var(--accent-orange-dim);
+    border-color: rgba(255, 133, 51, 0.4);
+    color: var(--accent-orange-bright);
 }
 
 .status-chip.chip-neutral {

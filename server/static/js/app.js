@@ -32,21 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------------------------------------
-// 1. Editorial Light Chart.js Initialization
+// 1. Technical Dark Chart.js Initialization (Black, Orange, Blue)
 // -------------------------------------------------------------
 function initCharts() {
-    const editorialLightOptions = {
+    const techDarkOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#ffffff',
-                titleColor: '#09090b',
-                bodyColor: '#09090b',
+                backgroundColor: '#151820',
+                titleColor: '#ffffff',
+                bodyColor: '#e2e8f0',
                 titleFont: { family: 'JetBrains Mono', size: 10, weight: '700' },
                 bodyFont: { family: 'JetBrains Mono', size: 11 },
-                borderColor: '#d1d1d6',
+                borderColor: '#282e3d',
                 borderWidth: 1,
                 padding: 8,
                 cornerRadius: 0,
@@ -57,9 +57,9 @@ function initCharts() {
             x: { display: false },
             y: {
                 display: true,
-                grid: { color: 'rgba(0, 0, 0, 0.04)', drawTicks: false },
+                grid: { color: 'rgba(255, 255, 255, 0.05)', drawTicks: false },
                 ticks: {
-                    color: '#71717a',
+                    color: '#94a3b8',
                     font: { family: 'JetBrains Mono', size: 8, weight: '600' },
                     maxTicksLimit: 3
                 },
@@ -67,8 +67,8 @@ function initCharts() {
             }
         },
         elements: {
-            point: { radius: 0, hoverRadius: 3, hoverBorderColor: '#000000' },
-            line: { tension: 0.25, borderWidth: 1.8 }
+            point: { radius: 0, hoverRadius: 4, hoverBorderColor: '#0ea5e9' },
+            line: { tension: 0.25, borderWidth: 2.0 }
         }
     };
 
@@ -79,12 +79,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyP99,
-                borderColor: "#000000",
-                backgroundColor: "rgba(0, 0, 0, 0.02)",
+                borderColor: "#0ea5e9", // Electric Blue
+                backgroundColor: "rgba(14, 165, 233, 0.08)",
                 fill: true
             }]
         },
-        options: editorialLightOptions
+        options: techDarkOptions
     });
 
     const ctxError = document.getElementById("chart-error").getContext("2d");
@@ -94,12 +94,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyError,
-                borderColor: "#dc2626",
-                backgroundColor: "rgba(220, 38, 38, 0.02)",
+                borderColor: "#ff6b00", // Vivid Orange
+                backgroundColor: "rgba(255, 107, 0, 0.08)",
                 fill: true
             }]
         },
-        options: editorialLightOptions
+        options: techDarkOptions
     });
 
     const ctxPool = document.getElementById("chart-pool").getContext("2d");
@@ -109,12 +109,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyPool,
-                borderColor: "#8a6508",
-                backgroundColor: "rgba(138, 101, 8, 0.02)",
+                borderColor: "#ff8533", // Amber Orange
+                backgroundColor: "rgba(255, 133, 51, 0.08)",
                 fill: true
             }]
         },
-        options: editorialLightOptions
+        options: techDarkOptions
     });
 
     const ctxRps = document.getElementById("chart-rps").getContext("2d");
@@ -124,12 +124,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyRps,
-                borderColor: "#4b5563",
-                backgroundColor: "rgba(75, 85, 99, 0.02)",
+                borderColor: "#38bdf8", // Cyan Blue
+                backgroundColor: "rgba(56, 189, 248, 0.08)",
                 fill: true
             }]
         },
-        options: editorialLightOptions
+        options: techDarkOptions
     });
 }
 
@@ -162,7 +162,7 @@ function updateChartData(p99, errorRate, poolSat, rps) {
 }
 
 // -------------------------------------------------------------
-// 2. Vis.js Dynamic 100-Microservice Topology Graph (Light Mode)
+// 2. Vis.js Dynamic 100-Microservice Topology Graph (Black, Orange, Blue)
 // -------------------------------------------------------------
 async function loadTopology() {
     try {
@@ -174,22 +174,22 @@ async function loadTopology() {
 
         data.nodes.forEach((n) => {
             nodeLookup[n.id] = n;
-            let bgColor = "#ffffff";
-            let borderColor = "#18181b";
-            let fontColor = "#09090b";
+            let bgColor = "#101217";
+            let borderColor = "#0ea5e9";
+            let fontColor = "#e2e8f0";
 
             if (n.status === "CRITICAL") {
-                bgColor = "#dc2626";
-                borderColor = "#000000";
-                fontColor = "#ffffff";
+                bgColor = "#ff6b00";
+                borderColor = "#ffffff";
+                fontColor = "#000000";
             } else if (n.status === "DEGRADED") {
-                bgColor = "#fef3c7";
-                borderColor = "#d97706";
-                fontColor = "#92400e";
+                bgColor = "#ff8533";
+                borderColor = "#ff6b00";
+                fontColor = "#000000";
             } else if (n.status === "SELF_HEALING") {
-                bgColor = "#000000";
-                borderColor = "#000000";
-                fontColor = "#ffffff";
+                bgColor = "#0ea5e9";
+                borderColor = "#38bdf8";
+                fontColor = "#000000";
             }
 
             visNodes.push({
@@ -199,7 +199,7 @@ async function loadTopology() {
                 color: {
                     background: bgColor,
                     border: borderColor,
-                    highlight: { background: "#000000", border: "#000000" }
+                    highlight: { background: "#ff6b00", border: "#ffffff" }
                 },
                 font: { color: fontColor, size: 9, face: "Space Grotesk", strokeWidth: 0 },
                 shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
@@ -214,8 +214,8 @@ async function loadTopology() {
                 from: e.source,
                 to: e.target,
                 arrows: "to",
-                color: { color: isHighLatency ? "#dc2626" : "#d1d1d6", opacity: isHighLatency ? 0.9 : 0.6 },
-                width: isHighLatency ? 1.8 : 0.8
+                color: { color: isHighLatency ? "#ff6b00" : "rgba(14, 165, 233, 0.45)", opacity: isHighLatency ? 0.95 : 0.6 },
+                width: isHighLatency ? 2.0 : 0.8
             });
         });
 
@@ -366,22 +366,22 @@ async function refreshTopologyStatus(activeFaults) {
         data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
             if (networkData.nodes) {
-                let bgColor = "#ffffff";
-                let borderColor = "#18181b";
-                let fontColor = "#09090b";
+                let bgColor = "#101217";
+                let borderColor = "#0ea5e9";
+                let fontColor = "#e2e8f0";
 
                 if (n.status === "CRITICAL") {
-                    bgColor = "#dc2626";
-                    borderColor = "#000000";
-                    fontColor = "#ffffff";
+                    bgColor = "#ff6b00";
+                    borderColor = "#ffffff";
+                    fontColor = "#000000";
                 } else if (n.status === "DEGRADED") {
-                    bgColor = "#fef3c7";
-                    borderColor = "#d97706";
-                    fontColor = "#92400e";
+                    bgColor = "#ff8533";
+                    borderColor = "#ff6b00";
+                    fontColor = "#000000";
                 } else if (n.status === "SELF_HEALING") {
-                    bgColor = "#000000";
-                    borderColor = "#000000";
-                    fontColor = "#ffffff";
+                    bgColor = "#0ea5e9";
+                    borderColor = "#38bdf8";
+                    fontColor = "#000000";
                 }
 
                 networkData.nodes.update({
