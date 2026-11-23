@@ -3,7 +3,7 @@
 > **B.Tech Major Project (Academic Year 2026–27)**  
 > **Institution:** Amity School of Engineering and Technology, Amity University Maharashtra  
 > **Department:** Department of Computer Science and Engineering  
-> **Lead Author:** Indrayu Nilesh Sandbhor (Enrolment No: `A70405223053`)
+> **Lead Author:** Dhruv Oswal (Enrolment No: `A70405223051`)
 
 ---
 
@@ -37,6 +37,28 @@ This project delivers an autonomous, closed-loop **Self-Healing Software Ecosyst
        [ Stage 6: Canary Verification & Atomic Rollback ]
          (Golden Signal Probing -> COMMITTED or ROLLED_BACK)
 ```
+
+---
+
+## 🛠️ Complete Technology Stack & Specifications
+
+| Layer / Subsystem | Technologies & Libraries | Version / Specification | Architectural Purpose in Ecosystem |
+| :--- | :--- | :--- | :--- |
+| **Core Runtime & Language** | **Python** | 3.10+ (Tested 3.14.6) | Central control plane runtime, mathematical modeling, and asynchronous event loop |
+| **API & Web Framework** | **FastAPI, Uvicorn, Starlette** | FastAPI 0.115+, Uvicorn 0.34+ | High-throughput asynchronous ASGI micro-framework with bidirectional WebSockets |
+| **Real-Time Data Streaming** | **WebSockets (Starlette)** | Native Async Stream ($1\text{Hz}$) | Live full-frame telemetry streaming to frontend dashboard without HTTP polling |
+| **Multivariate Anomaly Detection**| **PyTorch, Scikit-learn, NumPy** | PyTorch 2.15+, NumPy 2.x | Multimodal LSTM-Variational Autoencoder (LSTM-VAE) modeling latent drift ($z > 3.2\sigma$) |
+| **Log Intelligence Classifier** | **HuggingFace Transformers, LogBERT**| Pretrained Transformer | Semantic log exception pattern extraction and unstructured failure classification |
+| **Dynamic Graph Topology** | **NetworkX, PyTorch Geometric** | NetworkX 3.4+ | Dynamic Service Dependency Graph $G_t = (V_t, E_t)$, 2-hop anomalous blast-radius extraction |
+| **Graph Neural Network (GNN)** | **Spatiotemporal GATv2** | Multi-Head Edge Attention | 2-layer dynamic edge-attention GNN modeling non-linear backpressure propagation |
+| **Causal Inference Engine** | **Structural Causal Models (SCM)**| Pearl's $do$-Calculus, Fisher's Exact | Interventional counterfactual testing $P(\text{SLO} \mid do(X_i = x_{norm}))$ isolating true culprit |
+| **Digital Twin Simulator** | **SimPy / Queuing Network Theory** | $M/M/c$ Queuing Simulation | Pre-flight counterfactual queuing evaluation of latency recovery curves and blast costs ($c_t$) |
+| **Safe Reinforcement Learning** | **Safe-PPO (CMDP Agent)** | Lagrangian CMDP Optimization | Constrained policy optimization selecting optimal action under blast limit ($J_C \le 0.05$) |
+| **Kubernetes Actuator & etcd** | **Kubernetes Python API, etcd3** | K8s Operator Interface | Automated ConfigMap/HPA patches, rolling restarts, and atomic transactional snapshot rollbacks |
+| **Distributed Tracing & Metrics** | **OpenTelemetry, Prometheus, Loki**| W3C TraceContext | Distributed span propagation, gRPC metadata, Golden Signals (Latency, Error Rate, RPS, Saturation)|
+| **100-Microservice Mesh** | **100 Standalone Microservices** | Docker, gRPC, HTTP | Generated codebases (`svc_001` - `svc_100`) with connection pools, circuit breakers, and metrics |
+| **Frontend Visualization** | **Vis.js Network, Chart.js, CSS3** | Space Grotesk & JetBrains Mono | Interactive force-directed topology graph, live sparklines, and Black/Orange/Blue design system |
+| **Chaos Engineering Suite** | **ChaosMesh Bridge, Synthetic Engine** | Chaos Fault Injector | HikariCP pool exhaustion, JVM memory leak, CPU thread starvation, and cascading retry storm |
 
 ---
 

@@ -5,4 +5,4 @@ Academic Year 2026-27 | B.Tech Major Project
 """
 
 __version__ = "1.0.0"
-__author__ = "Indrayu Nilesh Sandbhor (A70405223053)"
+__author__ = "Dhruv Oswal (A70405223051)"

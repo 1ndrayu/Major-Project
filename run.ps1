@@ -1,7 +1,7 @@
 # PowerShell Startup Script for Self-Healing Software Ecosystem
 Write-Host "========================================================================" -ForegroundColor Cyan
 Write-Host "   SELF-HEALING SOFTWARE ECOSYSTEM (B.TECH MAJOR PROJECT 2026-27)" -ForegroundColor Cyan
-Write-Host "   Amity University Maharashtra | Indrayu Nilesh Sandbhor (A70405223053)" -ForegroundColor Yellow
+Write-Host "   Amity University Maharashtra | Dhruv Oswal (A70405223051)" -ForegroundColor Yellow
 Write-Host "========================================================================" -ForegroundColor Cyan
 Write-Host ""
 

@@ -12,7 +12,7 @@
 **Bachelor of Technology in Computer Science & Engineering**
 
 ### Submitted By:
-- **Indrayu Nilesh Sandbhor** (Enrolment No: `A70405223053`)
+- **Dhruv Oswal** (Enrolment No: `A70405223051`)
 
 ---
 
@@ -21,7 +21,7 @@
 I declare that this written submission conveys our ideas in our own words. I have adequately cited and referenced original sources. I also declare that I have adhered to all principles of academic honesty and integrity and have not misrepresented or fabricated or falsified any idea/date/fact/source in our submission.
 
 **Student Signature:**  
-Indrayu Nilesh Sandbhor (`A70405223053`)
+Dhruv Oswal (`A70405223051`)
 
 ---
 

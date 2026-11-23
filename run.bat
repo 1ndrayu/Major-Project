@@ -3,7 +3,7 @@ title Self-Healing Software Ecosystem - Live Dashboard
 echo ========================================================================
 echo    SELF-HEALING SOFTWARE ECOSYSTEM (B.TECH MAJOR PROJECT 2026-27)
 echo    Amity University Maharashtra - Department of Computer Science
-echo    Author: Indrayu Nilesh Sandbhor (A70405223053)
+echo    Author: Dhruv Oswal (A70405223051)
 echo ========================================================================
 echo.
 echo [*] Checking dependencies...
