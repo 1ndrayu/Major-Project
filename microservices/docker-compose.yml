@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # 1. Edge Web Frontend
+  web-ui-frontend:
+    build: ./svc_001_web_ui_frontend
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVICE_ID=svc-001
+      - SERVICE_NAME=Web-UI-Frontend
+      - PORT=8001
+
+  # 2. API Gateway Alpha
+  api-gateway-alpha:
+    build: ./svc_006_api_gateway_alpha
+    ports:
+      - "8006:8006"
+    environment:
+      - SERVICE_ID=svc-006
+      - SERVICE_NAME=API-Gateway-Alpha
+      - PORT=8006
+
+  # 3. Checkout API Service
+  checkout-api-service:
+    build: ./svc_016_checkout_api_service
+    ports:
+      - "8016:8016"
+    environment:
+      - SERVICE_ID=svc-016
+      - SERVICE_NAME=Checkout-API-Service
+      - PORT=8016
+
+  # 4. Order Orchestrator Saga
+  order-orchestrator-saga:
+    build: ./svc_017_order_orchestrator_saga
+    ports:
+      - "8017:8017"
+    environment:
+      - SERVICE_ID=svc-017
+      - SERVICE_NAME=Order-Orchestrator-Saga
+      - PORT=8017
+
+  # 5. Cart State Service
+  cart-state-service:
+    build: ./svc_018_cart_state_service
+    ports:
+      - "8018:8018"
+    environment:
+      - SERVICE_ID=svc-018
+      - SERVICE_NAME=Cart-State-Service
+      - PORT=8018
+
+  # 6. Payment Settlement Core
+  payment-settlement-core:
+    build: ./svc_020_payment_settlement_core
+    ports:
+      - "8020:8020"
+    environment:
+      - SERVICE_ID=svc-020
+      - SERVICE_NAME=Payment-Settlement-Core
+      - PORT=8020
+
+  # 7. Order DB Adapter (Primary Case Study)
+  order-db-adapter:
+    build: ./svc_066_order_db_adapter
+    ports:
+      - "8066:8066"
+    environment:
+      - SERVICE_ID=svc-066
+      - SERVICE_NAME=Order-DB-Adapter
+      - PORT=8066
+      - HIKARI_MAX_POOL_SIZE=50
+      - HIKARI_IDLE_TIMEOUT_SEC=30

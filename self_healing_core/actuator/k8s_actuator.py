@@ -79,13 +79,13 @@ class KubernetesActuator:
         if action.primitive == RemediationPrimitive.RESIZE_DB_CONN_POOL:
             new_max = action.parameters.get("max_connections", 120)
             old_max = node.db_pool_max
+            self.collector.clear_fault(sid)
             node.db_pool_max = new_max
             # Relieve pool saturation immediately as capacity expands
             node.db_pool_active = min(new_max, int(new_max * 0.35))
             node.p95_latency_ms = 24.0
             node.p99_latency_ms = 48.0
             node.error_rate = 0.0005
-            self.collector.clear_fault(sid)
             result_details["mutations"] = {
                 "configmap_patch": f"maximum-pool-size: {old_max} -> {new_max}",
                 "leak_detection": "enabled (5000ms threshold)"
