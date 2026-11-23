@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphql-aggregator
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: graphql-aggregator
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: gateway
+    service-id: svc-009
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: graphql-aggregator
+  template:
+    metadata:
+      labels:
+        app: graphql-aggregator
+        tier: gateway
+        service-id: svc-009
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8009"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-01
+      containers:
+      - name: graphql-aggregator
+        image: selfhealing/graphql-aggregator:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8009
+          name: http
+        resources:
+          requests:
+            cpu: "320m"
+            memory: "620Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1550Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-009"
+        - name: SERVICE_NAME
+          value: "GraphQL-Aggregator"
+        - name: PORT
+          value: "8009"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8009
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8009
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphql-aggregator
+  namespace: self-healing-ecosystem
+  labels:
+    app: graphql-aggregator
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8009
+    targetPort: 8009
+    protocol: TCP
+    name: http
+  selector:
+    app: graphql-aggregator

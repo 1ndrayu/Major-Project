@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-rating-aggregator
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: review-rating-aggregator
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-038
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: review-rating-aggregator
+  template:
+    metadata:
+      labels:
+        app: review-rating-aggregator
+        tier: middleware
+        service-id: svc-038
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8038"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-06
+      containers:
+      - name: review-rating-aggregator
+        image: selfhealing/review-rating-aggregator:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8038
+          name: http
+        resources:
+          requests:
+            cpu: "180m"
+            memory: "320Mi"
+          limits:
+            cpu: "1000m"
+            memory: "800Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-038"
+        - name: SERVICE_NAME
+          value: "Review-Rating-Aggregator"
+        - name: PORT
+          value: "8038"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8038
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8038
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-rating-aggregator
+  namespace: self-healing-ecosystem
+  labels:
+    app: review-rating-aggregator
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8038
+    targetPort: 8038
+    protocol: TCP
+    name: http
+  selector:
+    app: review-rating-aggregator

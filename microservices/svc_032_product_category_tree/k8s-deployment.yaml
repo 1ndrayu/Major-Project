@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-category-tree
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: product-category-tree
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-032
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-category-tree
+  template:
+    metadata:
+      labels:
+        app: product-category-tree
+        tier: middleware
+        service-id: svc-032
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8032"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-08
+      containers:
+      - name: product-category-tree
+        image: selfhealing/product-category-tree:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8032
+          name: http
+        resources:
+          requests:
+            cpu: "220m"
+            memory: "370Mi"
+          limits:
+            cpu: "1000m"
+            memory: "925Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-032"
+        - name: SERVICE_NAME
+          value: "Product-Category-Tree"
+        - name: PORT
+          value: "8032"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8032
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8032
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-category-tree
+  namespace: self-healing-ecosystem
+  labels:
+    app: product-category-tree
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8032
+    targetPort: 8032
+    protocol: TCP
+    name: http
+  selector:
+    app: product-category-tree

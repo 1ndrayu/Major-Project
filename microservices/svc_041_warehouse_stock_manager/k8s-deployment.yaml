@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: warehouse-stock-manager
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: warehouse-stock-manager
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-041
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: warehouse-stock-manager
+  template:
+    metadata:
+      labels:
+        app: warehouse-stock-manager
+        tier: middleware
+        service-id: svc-041
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8041"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-01
+      containers:
+      - name: warehouse-stock-manager
+        image: selfhealing/warehouse-stock-manager:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8041
+          name: http
+        resources:
+          requests:
+            cpu: "270m"
+            memory: "460Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1150Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-041"
+        - name: SERVICE_NAME
+          value: "Warehouse-Stock-Manager"
+        - name: PORT
+          value: "8041"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8041
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8041
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: warehouse-stock-manager
+  namespace: self-healing-ecosystem
+  labels:
+    app: warehouse-stock-manager
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8041
+    targetPort: 8041
+    protocol: TCP
+    name: http
+  selector:
+    app: warehouse-stock-manager

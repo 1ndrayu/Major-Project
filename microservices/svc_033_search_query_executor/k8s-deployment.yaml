@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-query-executor
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: search-query-executor
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-033
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: search-query-executor
+  template:
+    metadata:
+      labels:
+        app: search-query-executor
+        tier: middleware
+        service-id: svc-033
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8033"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-01
+      containers:
+      - name: search-query-executor
+        image: selfhealing/search-query-executor:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8033
+          name: http
+        resources:
+          requests:
+            cpu: "450m"
+            memory: "890Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2225Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-033"
+        - name: SERVICE_NAME
+          value: "Search-Query-Executor"
+        - name: PORT
+          value: "8033"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8033
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8033
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-query-executor
+  namespace: self-healing-ecosystem
+  labels:
+    app: search-query-executor
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8033
+    targetPort: 8033
+    protocol: TCP
+    name: http
+  selector:
+    app: search-query-executor

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cross-border-customs
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: cross-border-customs
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-053
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cross-border-customs
+  template:
+    metadata:
+      labels:
+        app: cross-border-customs
+        tier: middleware
+        service-id: svc-053
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8053"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-05
+      containers:
+      - name: cross-border-customs
+        image: selfhealing/cross-border-customs:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8053
+          name: http
+        resources:
+          requests:
+            cpu: "160m"
+            memory: "290Mi"
+          limits:
+            cpu: "1000m"
+            memory: "725Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-053"
+        - name: SERVICE_NAME
+          value: "Cross-Border-Customs"
+        - name: PORT
+          value: "8053"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8053
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8053
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cross-border-customs
+  namespace: self-healing-ecosystem
+  labels:
+    app: cross-border-customs
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8053
+    targetPort: 8053
+    protocol: TCP
+    name: http
+  selector:
+    app: cross-border-customs

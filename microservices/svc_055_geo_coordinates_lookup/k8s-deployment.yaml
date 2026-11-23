@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geo-coordinates-lookup
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: geo-coordinates-lookup
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-055
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: geo-coordinates-lookup
+  template:
+    metadata:
+      labels:
+        app: geo-coordinates-lookup
+        tier: middleware
+        service-id: svc-055
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8055"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-07
+      containers:
+      - name: geo-coordinates-lookup
+        image: selfhealing/geo-coordinates-lookup:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8055
+          name: http
+        resources:
+          requests:
+            cpu: "190m"
+            memory: "320Mi"
+          limits:
+            cpu: "1000m"
+            memory: "800Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-055"
+        - name: SERVICE_NAME
+          value: "Geo-Coordinates-Lookup"
+        - name: PORT
+          value: "8055"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8055
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8055
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geo-coordinates-lookup
+  namespace: self-healing-ecosystem
+  labels:
+    app: geo-coordinates-lookup
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8055
+    targetPort: 8055
+    protocol: TCP
+    name: http
+  selector:
+    app: geo-coordinates-lookup

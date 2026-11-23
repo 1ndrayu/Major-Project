@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autonomous-self-healing-operator
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: autonomous-self-healing-operator
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: analytics
+    service-id: svc-100
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: autonomous-self-healing-operator
+  template:
+    metadata:
+      labels:
+        app: autonomous-self-healing-operator
+        tier: analytics
+        service-id: svc-100
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8100"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-04
+      containers:
+      - name: autonomous-self-healing-operator
+        image: selfhealing/autonomous-self-healing-operator:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8100
+          name: http
+        resources:
+          requests:
+            cpu: "280m"
+            memory: "520Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1300Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-100"
+        - name: SERVICE_NAME
+          value: "Autonomous-Self-Healing-Operator"
+        - name: PORT
+          value: "8100"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8100
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8100
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autonomous-self-healing-operator
+  namespace: self-healing-ecosystem
+  labels:
+    app: autonomous-self-healing-operator
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8100
+    targetPort: 8100
+    protocol: TCP
+    name: http
+  selector:
+    app: autonomous-self-healing-operator

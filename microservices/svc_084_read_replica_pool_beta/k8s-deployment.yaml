@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: read-replica-pool-beta
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: read-replica-pool-beta
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: database
+    service-id: svc-084
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: read-replica-pool-beta
+  template:
+    metadata:
+      labels:
+        app: read-replica-pool-beta
+        tier: database
+        service-id: svc-084
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8084"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-04
+      containers:
+      - name: read-replica-pool-beta
+        image: selfhealing/read-replica-pool-beta:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8084
+          name: http
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "570Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1425Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-084"
+        - name: SERVICE_NAME
+          value: "Read-Replica-Pool-Beta"
+        - name: PORT
+          value: "8084"
+        - name: HIKARI_MAX_POOL_SIZE\n          value: '45'
+        - name: HIKARI_IDLE_TIMEOUT_SEC\n          value: '30'
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8084
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8084
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: read-replica-pool-beta
+  namespace: self-healing-ecosystem
+  labels:
+    app: read-replica-pool-beta
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8084
+    targetPort: 8084
+    protocol: TCP
+    name: http
+  selector:
+    app: read-replica-pool-beta

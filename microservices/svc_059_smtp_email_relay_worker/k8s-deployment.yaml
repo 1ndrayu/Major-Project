@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smtp-email-relay-worker
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: smtp-email-relay-worker
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: messaging
+    service-id: svc-059
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: smtp-email-relay-worker
+  template:
+    metadata:
+      labels:
+        app: smtp-email-relay-worker
+        tier: messaging
+        service-id: svc-059
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8059"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-03
+      containers:
+      - name: smtp-email-relay-worker
+        image: selfhealing/smtp-email-relay-worker:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8059
+          name: http
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "360Mi"
+          limits:
+            cpu: "1000m"
+            memory: "900Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-059"
+        - name: SERVICE_NAME
+          value: "SMTP-Email-Relay-Worker"
+        - name: PORT
+          value: "8059"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8059
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8059
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smtp-email-relay-worker
+  namespace: self-healing-ecosystem
+  labels:
+    app: smtp-email-relay-worker
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8059
+    targetPort: 8059
+    protocol: TCP
+    name: http
+  selector:
+    app: smtp-email-relay-worker

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-clickhouse-proxy
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: analytics-clickhouse-proxy
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: database
+    service-id: svc-075
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: analytics-clickhouse-proxy
+  template:
+    metadata:
+      labels:
+        app: analytics-clickhouse-proxy
+        tier: database
+        service-id: svc-075
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8075"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-03
+      containers:
+      - name: analytics-clickhouse-proxy
+        image: selfhealing/analytics-clickhouse-proxy:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8075
+          name: http
+        resources:
+          requests:
+            cpu: "420m"
+            memory: "880Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2200Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-075"
+        - name: SERVICE_NAME
+          value: "Analytics-ClickHouse-Proxy"
+        - name: PORT
+          value: "8075"
+        - name: HIKARI_MAX_POOL_SIZE\n          value: '35'
+        - name: HIKARI_IDLE_TIMEOUT_SEC\n          value: '30'
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8075
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8075
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-clickhouse-proxy
+  namespace: self-healing-ecosystem
+  labels:
+    app: analytics-clickhouse-proxy
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8075
+    targetPort: 8075
+    protocol: TCP
+    name: http
+  selector:
+    app: analytics-clickhouse-proxy

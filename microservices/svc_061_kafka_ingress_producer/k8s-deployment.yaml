@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ingress-producer
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: kafka-ingress-producer
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: messaging
+    service-id: svc-061
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kafka-ingress-producer
+  template:
+    metadata:
+      labels:
+        app: kafka-ingress-producer
+        tier: messaging
+        service-id: svc-061
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8061"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-05
+      containers:
+      - name: kafka-ingress-producer
+        image: selfhealing/kafka-ingress-producer:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8061
+          name: http
+        resources:
+          requests:
+            cpu: "340m"
+            memory: "600Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1500Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-061"
+        - name: SERVICE_NAME
+          value: "Kafka-Ingress-Producer"
+        - name: PORT
+          value: "8061"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8061
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8061
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ingress-producer
+  namespace: self-healing-ecosystem
+  labels:
+    app: kafka-ingress-producer
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8061
+    targetPort: 8061
+    protocol: TCP
+    name: http
+  selector:
+    app: kafka-ingress-producer

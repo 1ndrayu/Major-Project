@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-cluster-proxy
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: elasticsearch-cluster-proxy
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: middleware
+    service-id: svc-034
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: elasticsearch-cluster-proxy
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-cluster-proxy
+        tier: middleware
+        service-id: svc-034
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8034"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-02
+      containers:
+      - name: elasticsearch-cluster-proxy
+        image: selfhealing/elasticsearch-cluster-proxy:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8034
+          name: http
+        resources:
+          requests:
+            cpu: "400m"
+            memory: "810Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2025Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-034"
+        - name: SERVICE_NAME
+          value: "Elasticsearch-Cluster-Proxy"
+        - name: PORT
+          value: "8034"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8034
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8034
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-cluster-proxy
+  namespace: self-healing-ecosystem
+  labels:
+    app: elasticsearch-cluster-proxy
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8034
+    targetPort: 8034
+    protocol: TCP
+    name: http
+  selector:
+    app: elasticsearch-cluster-proxy

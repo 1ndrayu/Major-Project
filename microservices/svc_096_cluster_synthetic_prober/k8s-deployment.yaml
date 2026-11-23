@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-synthetic-prober
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: cluster-synthetic-prober
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: analytics
+    service-id: svc-096
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cluster-synthetic-prober
+  template:
+    metadata:
+      labels:
+        app: cluster-synthetic-prober
+        tier: analytics
+        service-id: svc-096
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8096"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-08
+      containers:
+      - name: cluster-synthetic-prober
+        image: selfhealing/cluster-synthetic-prober:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8096
+          name: http
+        resources:
+          requests:
+            cpu: "150m"
+            memory: "280Mi"
+          limits:
+            cpu: "1000m"
+            memory: "700Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-096"
+        - name: SERVICE_NAME
+          value: "Cluster-Synthetic-Prober"
+        - name: PORT
+          value: "8096"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8096
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8096
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cluster-synthetic-prober
+  namespace: self-healing-ecosystem
+  labels:
+    app: cluster-synthetic-prober
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8096
+    targetPort: 8096
+    protocol: TCP
+    name: http
+  selector:
+    app: cluster-synthetic-prober

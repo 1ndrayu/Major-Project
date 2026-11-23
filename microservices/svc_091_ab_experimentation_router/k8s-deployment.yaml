@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ab-experimentation-router
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: ab-experimentation-router
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: analytics
+    service-id: svc-091
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ab-experimentation-router
+  template:
+    metadata:
+      labels:
+        app: ab-experimentation-router
+        tier: analytics
+        service-id: svc-091
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8091"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-03
+      containers:
+      - name: ab-experimentation-router
+        image: selfhealing/ab-experimentation-router:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8091
+          name: http
+        resources:
+          requests:
+            cpu: "210m"
+            memory: "370Mi"
+          limits:
+            cpu: "1000m"
+            memory: "925Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-091"
+        - name: SERVICE_NAME
+          value: "AB-Experimentation-Router"
+        - name: PORT
+          value: "8091"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8091
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8091
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ab-experimentation-router
+  namespace: self-healing-ecosystem
+  labels:
+    app: ab-experimentation-router
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8091
+    targetPort: 8091
+    protocol: TCP
+    name: http
+  selector:
+    app: ab-experimentation-router

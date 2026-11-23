@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-ledger-db-proxy
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: payment-ledger-db-proxy
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: database
+    service-id: svc-068
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: payment-ledger-db-proxy
+  template:
+    metadata:
+      labels:
+        app: payment-ledger-db-proxy
+        tier: database
+        service-id: svc-068
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8068"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-04
+      containers:
+      - name: payment-ledger-db-proxy
+        image: selfhealing/payment-ledger-db-proxy:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8068
+          name: http
+        resources:
+          requests:
+            cpu: "360m"
+            memory: "690Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1725Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-068"
+        - name: SERVICE_NAME
+          value: "Payment-Ledger-DB-Proxy"
+        - name: PORT
+          value: "8068"
+        - name: HIKARI_MAX_POOL_SIZE\n          value: '45'
+        - name: HIKARI_IDLE_TIMEOUT_SEC\n          value: '30'
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8068
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8068
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-ledger-db-proxy
+  namespace: self-healing-ecosystem
+  labels:
+    app: payment-ledger-db-proxy
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8068
+    targetPort: 8068
+    protocol: TCP
+    name: http
+  selector:
+    app: payment-ledger-db-proxy

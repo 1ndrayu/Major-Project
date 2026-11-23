@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digital-invoice-generator
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: digital-invoice-generator
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: order_payment
+    service-id: svc-029
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: digital-invoice-generator
+  template:
+    metadata:
+      labels:
+        app: digital-invoice-generator
+        tier: order_payment
+        service-id: svc-029
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8029"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-05
+      containers:
+      - name: digital-invoice-generator
+        image: selfhealing/digital-invoice-generator:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8029
+          name: http
+        resources:
+          requests:
+            cpu: "240m"
+            memory: "410Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1025Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-029"
+        - name: SERVICE_NAME
+          value: "Digital-Invoice-Generator"
+        - name: PORT
+          value: "8029"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8029
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8029
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: digital-invoice-generator
+  namespace: self-healing-ecosystem
+  labels:
+    app: digital-invoice-generator
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8029
+    targetPort: 8029
+    protocol: TCP
+    name: http
+  selector:
+    app: digital-invoice-generator

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-db-adapter
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: order-db-adapter
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: database
+    service-id: svc-066
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-db-adapter
+  template:
+    metadata:
+      labels:
+        app: order-db-adapter
+        tier: database
+        service-id: svc-066
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8066"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-02
+      containers:
+      - name: order-db-adapter
+        image: selfhealing/order-db-adapter:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8066
+          name: http
+        resources:
+          requests:
+            cpu: "380m"
+            memory: "720Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1800Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-066"
+        - name: SERVICE_NAME
+          value: "Order-DB-Adapter"
+        - name: PORT
+          value: "8066"
+        - name: HIKARI_MAX_POOL_SIZE\n          value: '50'
+        - name: HIKARI_IDLE_TIMEOUT_SEC\n          value: '30'
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8066
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8066
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-db-adapter
+  namespace: self-healing-ecosystem
+  labels:
+    app: order-db-adapter
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8066
+    targetPort: 8066
+    protocol: TCP
+    name: http
+  selector:
+    app: order-db-adapter

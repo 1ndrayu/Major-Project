@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enterprise-audit-logger
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: enterprise-audit-logger
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: messaging
+    service-id: svc-063
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: enterprise-audit-logger
+  template:
+    metadata:
+      labels:
+        app: enterprise-audit-logger
+        tier: messaging
+        service-id: svc-063
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8063"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-07
+      containers:
+      - name: enterprise-audit-logger
+        image: selfhealing/enterprise-audit-logger:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8063
+          name: http
+        resources:
+          requests:
+            cpu: "210m"
+            memory: "380Mi"
+          limits:
+            cpu: "1000m"
+            memory: "950Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-063"
+        - name: SERVICE_NAME
+          value: "Enterprise-Audit-Logger"
+        - name: PORT
+          value: "8063"
+        
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8063
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8063
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enterprise-audit-logger
+  namespace: self-healing-ecosystem
+  labels:
+    app: enterprise-audit-logger
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8063
+    targetPort: 8063
+    protocol: TCP
+    name: http
+  selector:
+    app: enterprise-audit-logger

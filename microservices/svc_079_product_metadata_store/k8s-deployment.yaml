@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-metadata-store
+  namespace: self-healing-ecosystem
+  labels:
+    app.kubernetes.io/name: product-metadata-store
+    app.kubernetes.io/part-of: self-healing-software-ecosystem
+    tier: database
+    service-id: svc-079
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-metadata-store
+  template:
+    metadata:
+      labels:
+        app: product-metadata-store
+        tier: database
+        service-id: svc-079
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8079"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-07
+      containers:
+      - name: product-metadata-store
+        image: selfhealing/product-metadata-store:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8079
+          name: http
+        resources:
+          requests:
+            cpu: "280m"
+            memory: "510Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1275Mi"
+        env:
+        - name: SERVICE_ID
+          value: "svc-079"
+        - name: SERVICE_NAME
+          value: "Product-Metadata-Store"
+        - name: PORT
+          value: "8079"
+        - name: HIKARI_MAX_POOL_SIZE\n          value: '35'
+        - name: HIKARI_IDLE_TIMEOUT_SEC\n          value: '30'
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8079
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8079
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-metadata-store
+  namespace: self-healing-ecosystem
+  labels:
+    app: product-metadata-store
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8079
+    targetPort: 8079
+    protocol: TCP
+    name: http
+  selector:
+    app: product-metadata-store
