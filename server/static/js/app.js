@@ -1,15 +1,18 @@
 /**
- * AIOps Autonomous Self-Healing Ecosystem - Frontend Logic
- * Design System: CRED Luxury & H&M High-Fashion Editorial (Light Mode)
- * Handles Real-Time WebSockets, Vis.js 100-Service Dynamic Graph,
- * Chart.js Golden Signals, Chaos Injection, and Stepped Pipeline Execution.
+ * AIOps Autonomous Self-Healing Ecosystem - Revamped Frontend Engine
+ * Modern, Clean, Intuitive Control Plane
+ * High-Contrast Palette: Deep Onyx Black • Vivid Orange • Electric Blue
  */
 
 let network = null;
 let networkData = { nodes: null, edges: null };
+let allNodesCache = [];
+let allEdgesCache = [];
 let nodeLookup = {};
 let currentSelectedNodeId = "svc-066";
 let currentStage = 1;
+let isAutoHealingActive = false;
+let isFocusMode = true; // Default to clean blast-radius focus
 
 // Chart instances
 let chartP99 = null;
@@ -17,7 +20,7 @@ let chartError = null;
 let chartPool = null;
 let chartRps = null;
 
-// Telemetry history for charts (max 25 data points)
+// Telemetry history (max 20 points)
 const historyP99 = [];
 const historyError = [];
 const historyPool = [];
@@ -32,43 +35,61 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------------------------------------
-// 1. Technical Dark Chart.js Initialization (Black, Orange, Blue)
+// 1. Tab Navigation
+// -------------------------------------------------------------
+function switchTab(tabId) {
+    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+
+    const targetContent = document.getElementById(tabId);
+    if (targetContent) targetContent.classList.add("active");
+
+    const activeBtn = Array.from(document.querySelectorAll(".tab-btn")).find(btn =>
+        btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)
+    );
+    if (activeBtn) activeBtn.classList.add("active");
+
+    // Hide/show topology-specific actions in tab header
+    const tabActions = document.getElementById("tab-top-actions");
+    if (tabActions) {
+        tabActions.style.display = tabId === "tab-topology" ? "flex" : "none";
+    }
+
+    // Refresh graph rendering if switching to topology tab
+    if (tabId === "tab-topology" && network) {
+        setTimeout(() => network.fit(), 150);
+    }
+}
+
+// -------------------------------------------------------------
+// 2. Minimalist Golden Signals (Chart.js)
 // -------------------------------------------------------------
 function initCharts() {
-    const techDarkOptions = {
+    const cleanChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#151820',
+                backgroundColor: '#161a24',
                 titleColor: '#ffffff',
                 bodyColor: '#e2e8f0',
-                titleFont: { family: 'JetBrains Mono', size: 10, weight: '700' },
-                bodyFont: { family: 'JetBrains Mono', size: 11 },
-                borderColor: '#282e3d',
+                titleFont: { family: 'JetBrains Mono', size: 9, weight: '700' },
+                bodyFont: { family: 'JetBrains Mono', size: 10 },
+                borderColor: '#2a3347',
                 borderWidth: 1,
-                padding: 8,
-                cornerRadius: 0,
+                padding: 6,
+                cornerRadius: 4,
                 displayColors: false
             }
         },
         scales: {
             x: { display: false },
-            y: {
-                display: true,
-                grid: { color: 'rgba(255, 255, 255, 0.05)', drawTicks: false },
-                ticks: {
-                    color: '#94a3b8',
-                    font: { family: 'JetBrains Mono', size: 8, weight: '600' },
-                    maxTicksLimit: 3
-                },
-                border: { display: false }
-            }
+            y: { display: false }
         },
         elements: {
-            point: { radius: 0, hoverRadius: 4, hoverBorderColor: '#0ea5e9' },
-            line: { tension: 0.25, borderWidth: 2.0 }
+            point: { radius: 0, hoverRadius: 3, hoverBorderColor: '#0ea5e9' },
+            line: { tension: 0.3, borderWidth: 2.0 }
         }
     };
 
@@ -80,11 +101,11 @@ function initCharts() {
             datasets: [{
                 data: historyP99,
                 borderColor: "#0ea5e9", // Electric Blue
-                backgroundColor: "rgba(14, 165, 233, 0.08)",
+                backgroundColor: "rgba(14, 165, 233, 0.1)",
                 fill: true
             }]
         },
-        options: techDarkOptions
+        options: cleanChartOptions
     });
 
     const ctxError = document.getElementById("chart-error").getContext("2d");
@@ -95,11 +116,11 @@ function initCharts() {
             datasets: [{
                 data: historyError,
                 borderColor: "#ff6b00", // Vivid Orange
-                backgroundColor: "rgba(255, 107, 0, 0.08)",
+                backgroundColor: "rgba(255, 107, 0, 0.1)",
                 fill: true
             }]
         },
-        options: techDarkOptions
+        options: cleanChartOptions
     });
 
     const ctxPool = document.getElementById("chart-pool").getContext("2d");
@@ -110,11 +131,11 @@ function initCharts() {
             datasets: [{
                 data: historyPool,
                 borderColor: "#ff8533", // Amber Orange
-                backgroundColor: "rgba(255, 133, 51, 0.08)",
+                backgroundColor: "rgba(255, 133, 51, 0.1)",
                 fill: true
             }]
         },
-        options: techDarkOptions
+        options: cleanChartOptions
     });
 
     const ctxRps = document.getElementById("chart-rps").getContext("2d");
@@ -124,12 +145,12 @@ function initCharts() {
             labels: timeLabels,
             datasets: [{
                 data: historyRps,
-                borderColor: "#38bdf8", // Cyan Blue
-                backgroundColor: "rgba(56, 189, 248, 0.08)",
+                borderColor: "#38bdf8", // Cyan
+                backgroundColor: "rgba(56, 189, 248, 0.1)",
                 fill: true
             }]
         },
-        options: techDarkOptions
+        options: cleanChartOptions
     });
 }
 
@@ -141,7 +162,7 @@ function updateChartData(p99, errorRate, poolSat, rps) {
     historyPool.push(poolSat * 100);
     historyRps.push(rps);
 
-    if (timeLabels.length > 25) {
+    if (timeLabels.length > 20) {
         timeLabels.shift();
         historyP99.shift();
         historyError.shift();
@@ -154,7 +175,7 @@ function updateChartData(p99, errorRate, poolSat, rps) {
     chartPool.update();
     chartRps.update();
 
-    // Update numbers with crisp black typography
+    // Update numbers
     document.getElementById("metric-p99").innerHTML = `${p99.toFixed(1)} <span class="unit">ms</span>`;
     document.getElementById("metric-error").innerHTML = `${(errorRate * 100).toFixed(2)} <span class="unit">%</span>`;
     document.getElementById("metric-pool").innerHTML = `${(poolSat * 100).toFixed(1)} <span class="unit">%</span>`;
@@ -162,103 +183,138 @@ function updateChartData(p99, errorRate, poolSat, rps) {
 }
 
 // -------------------------------------------------------------
-// 2. Vis.js Dynamic 100-Microservice Topology Graph (Black, Orange, Blue)
+// 3. Dynamic Topology Graph (Focused & De-cluttered)
 // -------------------------------------------------------------
 async function loadTopology() {
     try {
         const resp = await fetch("/api/cluster/topology");
         const data = await resp.json();
 
-        const visNodes = [];
-        const visEdges = [];
+        allNodesCache = data.nodes;
+        allEdgesCache = data.edges;
 
-        data.nodes.forEach((n) => {
+        data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
-            let bgColor = "#101217";
-            let borderColor = "#0ea5e9";
-            let fontColor = "#e2e8f0";
-
-            if (n.status === "CRITICAL") {
-                bgColor = "#ff6b00";
-                borderColor = "#ffffff";
-                fontColor = "#000000";
-            } else if (n.status === "DEGRADED") {
-                bgColor = "#ff8533";
-                borderColor = "#ff6b00";
-                fontColor = "#000000";
-            } else if (n.status === "SELF_HEALING") {
-                bgColor = "#0ea5e9";
-                borderColor = "#38bdf8";
-                fontColor = "#000000";
-            }
-
-            visNodes.push({
-                id: n.id,
-                label: n.name.length > 18 ? n.name.substring(0, 16) + '..' : n.name,
-                title: `${n.name} [${n.id}]\nTier: ${n.tier}\nHost: ${n.host_node}\np99: ${n.p99_latency_ms}ms`,
-                color: {
-                    background: bgColor,
-                    border: borderColor,
-                    highlight: { background: "#ff6b00", border: "#ffffff" }
-                },
-                font: { color: fontColor, size: 9, face: "Space Grotesk", strokeWidth: 0 },
-                shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
-                size: n.id === "svc-066" ? 22 : 13
-            });
         });
 
-        data.edges.forEach((e, idx) => {
+        renderGraph();
+        selectService("svc-066");
+
+    } catch (e) {
+        console.error("Failed to load topology:", e);
+    }
+}
+
+function renderGraph() {
+    const visNodes = [];
+    const visEdges = [];
+
+    // Filter nodes if in Focus Mode (only show primary tiers & blast-radius nodes)
+    let filteredNodes = allNodesCache;
+    if (isFocusMode) {
+        // Show active culprit, degraded nodes, and critical tier dependencies (around 20-30 clean nodes)
+        const relevantIds = new Set(["svc-066", "svc-001", "svc-002", "svc-016", "svc-018", "svc-020", "svc-006", "svc-007", "svc-008", "svc-010", "svc-012", "svc-025", "svc-030", "svc-040", "svc-050", "svc-060", "svc-070", "svc-080", "svc-090", "svc-100"]);
+
+        // Include any node currently degraded or critical
+        allNodesCache.forEach(n => {
+            if (n.status === "CRITICAL" || n.status === "DEGRADED" || n.status === "SELF_HEALING") {
+                relevantIds.add(n.id);
+            }
+        });
+
+        filteredNodes = allNodesCache.filter(n => relevantIds.has(n.id));
+    }
+
+    filteredNodes.forEach((n) => {
+        let bgColor = "#10131a";
+        let borderColor = "#0ea5e9";
+        let fontColor = "#f1f5f9";
+
+        if (n.status === "CRITICAL") {
+            bgColor = "#ff6b00";
+            borderColor = "#ffffff";
+            fontColor = "#000000";
+        } else if (n.status === "DEGRADED") {
+            bgColor = "#ff8533";
+            borderColor = "#ff6b00";
+            fontColor = "#000000";
+        } else if (n.status === "SELF_HEALING") {
+            bgColor = "#0ea5e9";
+            borderColor = "#38bdf8";
+            fontColor = "#000000";
+        }
+
+        visNodes.push({
+            id: n.id,
+            label: n.name.length > 16 ? n.name.substring(0, 14) + '..' : n.name,
+            title: `${n.name} [${n.id}]\nTier: ${n.tier}\nLatency: ${n.p99_latency_ms.toFixed(1)}ms`,
+            color: {
+                background: bgColor,
+                border: borderColor,
+                highlight: { background: "#ff6b00", border: "#ffffff" }
+            },
+            font: { color: fontColor, size: 10, face: "Space Grotesk" },
+            shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
+            size: n.id === "svc-066" ? 22 : 13
+        });
+    });
+
+    const activeNodeSet = new Set(filteredNodes.map(n => n.id));
+    allEdgesCache.forEach((e, idx) => {
+        if (activeNodeSet.has(e.source) && activeNodeSet.has(e.target)) {
             const isHighLatency = e.p99_latency_ms > 500;
             visEdges.push({
                 id: `e-${idx}`,
                 from: e.source,
                 to: e.target,
                 arrows: "to",
-                color: { color: isHighLatency ? "#ff6b00" : "rgba(14, 165, 233, 0.45)", opacity: isHighLatency ? 0.95 : 0.6 },
-                width: isHighLatency ? 2.0 : 0.8
+                color: { color: isHighLatency ? "#ff6b00" : "rgba(14, 165, 233, 0.4)", opacity: isHighLatency ? 0.95 : 0.6 },
+                width: isHighLatency ? 2.2 : 1.0
             });
-        });
+        }
+    });
 
-        const container = document.getElementById("network-topology-container");
-        container.innerHTML = "";
+    const container = document.getElementById("network-topology-container");
+    container.innerHTML = "";
 
-        networkData.nodes = new vis.DataSet(visNodes);
-        networkData.edges = new vis.DataSet(visEdges);
+    networkData.nodes = new vis.DataSet(visNodes);
+    networkData.edges = new vis.DataSet(visEdges);
 
-        const options = {
-            nodes: {
-                borderWidth: 1.5,
-                shadow: false
-            },
-            edges: {
-                smooth: { type: "continuous" }
-            },
-            physics: {
-                stabilization: { iterations: 120 },
-                barnesHut: { gravitationalConstant: -3600, centralGravity: 0.28, springLength: 75 }
-            },
-            interaction: { hover: true, tooltipDelay: 200 }
-        };
+    const options = {
+        nodes: { borderWidth: 1.5, shadow: false },
+        edges: { smooth: { type: "continuous" } },
+        physics: {
+            stabilization: { iterations: 100 },
+            barnesHut: { gravitationalConstant: -3200, centralGravity: 0.25, springLength: 85 }
+        },
+        interaction: { hover: true, tooltipDelay: 150 }
+    };
 
-        network = new vis.Network(container, networkData, options);
+    network = new vis.Network(container, networkData, options);
 
-        network.once('stabilizationIterationsDone', function() {
-            network.fit({ animation: { duration: 600, easingFunction: "easeInOutQuad" } });
-        });
+    network.once('stabilizationIterationsDone', function() {
+        network.fit({ animation: { duration: 500, easingFunction: "easeInOutQuad" } });
+    });
 
-        network.on("click", (params) => {
-            if (params.nodes.length > 0) {
-                const clickedId = params.nodes[0];
-                selectService(clickedId);
-            }
-        });
+    network.on("click", (params) => {
+        if (params.nodes.length > 0) {
+            selectService(params.nodes[0]);
+        }
+    });
+}
 
-        // Select Order-DB-Adapter by default
-        selectService("svc-066");
-
-    } catch (e) {
-        console.error("Failed to load topology:", e);
+function toggleGraphFocus() {
+    isFocusMode = !isFocusMode;
+    const btn = document.getElementById("btn-toggle-view");
+    if (btn) {
+        btn.textContent = isFocusMode ? "Blast Radius Focus" : "Full 100-Mesh View";
+        btn.className = isFocusMode ? "micro-btn active" : "micro-btn";
     }
+    renderGraph();
+}
+
+function resetGraphView() {
+    if (network) network.fit({ animation: { duration: 400, easingFunction: "easeInOutQuad" } });
 }
 
 function selectService(serviceId) {
@@ -295,17 +351,13 @@ function selectService(serviceId) {
         preview.textContent = `[CRITICAL] java.lang.OutOfMemoryError: Java heap space
 [WARN] Full GC pause took 2840ms. Stop-the-world event triggered.`;
     } else {
-        preview.textContent = `[INFO] ${n.name} healthy. Inbound throughput: ${n.request_rate_rps.toFixed(0)} req/s.
+        preview.textContent = `[INFO] ${n.name} operational. Inbound throughput: ${n.request_rate_rps.toFixed(0)} req/s.
 [INFO] W3C trace context propagated over gRPC. p99 response time: ${n.p99_latency_ms.toFixed(1)}ms`;
     }
 }
 
-function resetGraphView() {
-    if (network) network.fit({ animation: { duration: 500, easingFunction: "easeInOutQuad" } });
-}
-
 // -------------------------------------------------------------
-// 3. WebSocket Real-Time Telemetry Stream
+// 4. WebSocket Real-Time Telemetry Stream
 // -------------------------------------------------------------
 function initWebSocket() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -316,11 +368,10 @@ function initWebSocket() {
         try {
             const data = JSON.parse(event.data);
             if (data.type === "TELEMETRY_UPDATE") {
-                // Only sync pipeline stage from background telemetry if no autonomous cycle or manual stepping is active
+                // Update ticker only if idle
                 if (!isAutoHealingActive && currentStage === 1 && data.current_stage === 1) {
-                    // Update ticker only if still in steady state
                     const ticker = document.getElementById("pipeline-status-text");
-                    if (ticker && (!ticker.textContent || ticker.textContent.includes("steady state") || ticker.textContent.includes("ready") || ticker.textContent.includes("idle"))) {
+                    if (ticker && (!ticker.textContent || ticker.textContent.includes("operational") || ticker.textContent.includes("steady"))) {
                         ticker.textContent = data.status_message;
                     }
                 }
@@ -331,20 +382,17 @@ function initWebSocket() {
 
                 // Update status badge
                 const faultCount = Object.keys(data.active_faults).length;
-                document.getElementById("active-fault-pill").textContent = `${faultCount} Active`;
-
                 const badgeText = document.getElementById("system-status-text");
-                const dot = document.getElementById("system-status-badge").querySelector(".pip");
+                const pip = document.getElementById("system-status-pip");
 
                 if (faultCount === 0) {
-                    badgeText.textContent = "SYSTEM OPERATIONAL";
-                    dot.className = "pip pip-live";
+                    badgeText.textContent = "100 MICROSERVICES OPERATIONAL";
+                    pip.className = "pip pip-live";
                 } else {
-                    badgeText.textContent = `ANOMALY DETECTED // ${faultCount} FAULT${faultCount === 1 ? '' : 'S'}`;
-                    dot.className = "pip pip-critical";
+                    badgeText.textContent = `ANOMALY DETECTED // ${faultCount} ACTIVE FAULT${faultCount === 1 ? '' : 'S'}`;
+                    pip.className = "pip pip-critical";
                 }
 
-                // Periodically sync nodeLookup
                 if (data.active_faults) {
                     refreshTopologyStatus(data.active_faults);
                 }
@@ -363,12 +411,14 @@ async function refreshTopologyStatus(activeFaults) {
     try {
         const resp = await fetch("/api/cluster/topology");
         const data = await resp.json();
+        allNodesCache = data.nodes;
+
         data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
-            if (networkData.nodes) {
-                let bgColor = "#101217";
+            if (networkData.nodes && networkData.nodes.get(n.id)) {
+                let bgColor = "#10131a";
                 let borderColor = "#0ea5e9";
-                let fontColor = "#e2e8f0";
+                let fontColor = "#f1f5f9";
 
                 if (n.status === "CRITICAL") {
                     bgColor = "#ff6b00";
@@ -391,6 +441,7 @@ async function refreshTopologyStatus(activeFaults) {
                 });
             }
         });
+
         if (currentSelectedNodeId && nodeLookup[currentSelectedNodeId]) {
             selectService(currentSelectedNodeId);
         }
@@ -398,10 +449,8 @@ async function refreshTopologyStatus(activeFaults) {
 }
 
 // -------------------------------------------------------------
-// 4. Stepped & Autonomous Pipeline Execution
+// 5. Runway Stepper & Autonomous Loop
 // -------------------------------------------------------------
-let isAutoHealingActive = false;
-
 function setPipelineStage(stageNum, message) {
     currentStage = stageNum;
     for (let i = 1; i <= 6; i++) {
@@ -410,13 +459,13 @@ function setPipelineStage(stageNum, message) {
         if (!card || !statusEl) continue;
 
         if (i < stageNum) {
-            card.className = "stage-tile completed";
+            card.className = "runway-step completed";
             statusEl.textContent = "VERIFIED";
         } else if (i === stageNum) {
-            card.className = "stage-tile active";
+            card.className = "runway-step active";
             statusEl.textContent = "EXECUTING";
         } else {
-            card.className = "stage-tile";
+            card.className = "runway-step";
             statusEl.textContent = "STANDBY";
         }
     }
@@ -425,28 +474,15 @@ function setPipelineStage(stageNum, message) {
     }
 }
 
-function resetPipelineUI() {
-    currentStage = 1;
-    for (let i = 1; i <= 6; i++) {
-        const card = document.getElementById(`step-card-${i}`);
-        const statusEl = document.getElementById(`step-status-${i}`);
-        if (card) card.className = "stage-tile";
-        if (statusEl) statusEl.textContent = "STANDBY";
-    }
-    document.getElementById("pipeline-status-text").textContent = "Pipeline ready. Click 'STEP PIPELINE' or 'AUTONOMOUS EXECUTION' to initiate.";
-}
-
 async function stepStage() {
     if (isAutoHealingActive) return;
 
     const stepBtn = document.getElementById("btn-step-stage");
     stepBtn.disabled = true;
 
-    // Use currentStage (1 to 6)
     const stageToRun = currentStage > 6 ? 1 : currentStage;
 
     try {
-        // Set visual cue that this stage is executing
         setPipelineStage(stageToRun, `Executing Stage 0${stageToRun}...`);
 
         const resp = await fetch("/api/self-heal/step", {
@@ -456,30 +492,21 @@ async function stepStage() {
         });
         const res = await resp.json();
 
-        // Highlight affected/culprit nodes in topology based on stage
-        if (res.primary_service) {
-            selectService(res.primary_service);
-        } else if (res.culprit_service) {
-            selectService(res.culprit_service);
-        } else if (res.target_service) {
-            selectService(res.target_service);
-        }
+        if (res.primary_service) selectService(res.primary_service);
+        if (res.culprit_service) selectService(res.culprit_service);
+        if (res.target_service) selectService(res.target_service);
 
-        // Advance to next stage or finish
         if (stageToRun === 6) {
-            // Mark all stages completed
             for (let i = 1; i <= 6; i++) {
                 const card = document.getElementById(`step-card-${i}`);
                 const statusEl = document.getElementById(`step-status-${i}`);
-                if (card) card.className = "stage-tile completed";
+                if (card) card.className = "runway-step completed";
                 if (statusEl) statusEl.textContent = "VERIFIED";
             }
             document.getElementById("pipeline-status-text").textContent = res.message;
             currentStage = 1;
             refreshLedger();
-            setTimeout(() => {
-                refreshTopologyStatus({});
-            }, 500);
+            setTimeout(() => refreshTopologyStatus({}), 500);
         } else {
             const next = res.next_stage || (stageToRun + 1);
             setPipelineStage(next, res.message);
@@ -487,8 +514,7 @@ async function stepStage() {
 
         refreshTopologyStatus({});
     } catch (e) {
-        console.error("Pipeline step error:", e);
-        document.getElementById("pipeline-status-text").textContent = `Error in stage ${stageToRun}: ${e.message || e}`;
+        console.error("Step error:", e);
     } finally {
         stepBtn.disabled = false;
     }
@@ -504,12 +530,11 @@ async function triggerAutoHeal() {
 
     autoBtn.disabled = true;
     stepBtn.disabled = true;
-    autoBtn.innerHTML = `<span>RUNNING OODA...</span>`;
+    autoBtn.innerHTML = `<span>Running OODA Loop...</span>`;
 
     const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
     try {
-        // Sequentially execute all 6 stages with crisp visual progression
         for (let s = 1; s <= 6; s++) {
             setPipelineStage(s, `Executing Stage 0${s} in autonomous closed-loop...`);
 
@@ -520,7 +545,6 @@ async function triggerAutoHeal() {
             });
             const res = await resp.json();
 
-            // Highlight target in inspector
             if (res.primary_service) selectService(res.primary_service);
             if (res.culprit_service) selectService(res.culprit_service);
             if (res.target_service) selectService(res.target_service);
@@ -528,17 +552,13 @@ async function triggerAutoHeal() {
             document.getElementById("pipeline-status-text").textContent = res.message;
             refreshTopologyStatus({});
 
-            // Realistic pause per stage so observers can see the decision cycle
-            if (s < 6) {
-                await sleep(950);
-            }
+            if (s < 6) await sleep(900);
         }
 
-        // Mark all 6 stages verified
         for (let i = 1; i <= 6; i++) {
             const card = document.getElementById(`step-card-${i}`);
             const statusEl = document.getElementById(`step-status-${i}`);
-            if (card) card.className = "stage-tile completed";
+            if (card) card.className = "runway-step completed";
             if (statusEl) statusEl.textContent = "VERIFIED";
         }
 
@@ -547,8 +567,7 @@ async function triggerAutoHeal() {
         currentStage = 1;
 
     } catch (e) {
-        console.error("Autonomous execution error:", e);
-        document.getElementById("pipeline-status-text").textContent = `Autonomous loop error: ${e.message || e}`;
+        console.error("Autonomous error:", e);
     } finally {
         isAutoHealingActive = false;
         autoBtn.disabled = false;
@@ -558,7 +577,7 @@ async function triggerAutoHeal() {
 }
 
 // -------------------------------------------------------------
-// 5. Chaos Engineering Trigger Calls
+// 6. Chaos Fault Injection
 // -------------------------------------------------------------
 async function triggerChaos(scenario, target) {
     try {
@@ -571,8 +590,10 @@ async function triggerChaos(scenario, target) {
         setPipelineStage(1, `FAULT INJECTED // ${res.details.description} on ${res.details.target_name}`);
         selectService(target);
         refreshTopologyStatus({});
+        // Switch to topology tab automatically if not already there
+        switchTab('tab-topology');
     } catch (e) {
-        alert("Failed to inject chaos experiment: " + e);
+        alert("Failed to inject fault: " + e);
     }
 }
 
@@ -580,7 +601,7 @@ async function clearChaos() {
     try {
         const resp = await fetch("/api/chaos/clear", { method: "POST" });
         const res = await resp.json();
-        setPipelineStage(1, "Cluster steady-state baseline restored. Injected faults cleared.");
+        setPipelineStage(1, "Cluster baseline restored. Active faults cleared.");
         refreshTopologyStatus({});
     } catch (e) {
         alert("Failed to clear chaos: " + e);
@@ -588,7 +609,7 @@ async function clearChaos() {
 }
 
 // -------------------------------------------------------------
-// 6. Incident Audit Ledger & Post-Mortem Export
+// 7. Incident Audit Ledger
 // -------------------------------------------------------------
 async function refreshLedger() {
     try {
@@ -596,18 +617,18 @@ async function refreshLedger() {
         const data = await resp.json();
         const tbody = document.getElementById("incident-ledger-body");
 
-        if (data.incidents.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No incidents logged. Execute a synthetic fault above to initiate the autonomous cycle.</td></tr>`;
+        if (!data.incidents || data.incidents.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No incidents logged yet. Trigger a synthetic fault above to initiate the autonomous cycle.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = data.incidents.map(inc => `
             <tr>
-                <td><span class="mono-code">${inc.incident_id}</span></td>
-                <td><strong style="color:var(--cred-crimson)">${inc.culprit_service}</strong></td>
-                <td><span class="status-chip chip-gold">94.0%</span></td>
-                <td><span class="mono-code">${inc.remediation_action}</span></td>
-                <td><span class="mono-code">${inc.mttd_sec}s</span></td>
+                <td><span class="code-pill">${inc.incident_id}</span></td>
+                <td><strong style="color:var(--accent-orange)">${inc.culprit_service}</strong></td>
+                <td><span class="chip-gold">94.0%</span></td>
+                <td><span class="code-pill">${inc.remediation_action}</span></td>
+                <td><span class="code-pill">${inc.mttd_sec}s</span></td>
                 <td><span class="val-positive">${inc.mttr_sec}s</span></td>
                 <td><span class="status-chip chip-safe">${inc.verdict}</span></td>
             </tr>

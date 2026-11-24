@@ -4,415 +4,396 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>AIOps Autonomous Self-Healing Ecosystem | Production Control Plane</title>
-    <!-- Editorial & Technical Fonts: Space Grotesk & JetBrains Mono -->
+    <title>Autonomous Self-Healing Software Ecosystem | Control Plane</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Vis.js Network Graph CDN -->
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <!-- Chart.js CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Vis.js & Chart.js -->
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/static/css/style.css?v=black-orange-blue.1.0">
+    <link rel="stylesheet" href="/static/css/style.css?v=revamp.1.0">
 </head>
 <body>
-    <div class="app-layout">
-        <!-- Top Navigation: CRED Luxury Minimalist Header -->
-        <header class="masthead">
-            <div class="masthead-brand">
-                <div class="brand-monogram">CR</div>
-                <div class="brand-titles">
-                    <div class="brand-kicker">AUTONOMOUS RESILIENCE ARCHITECTURE // AMITY 2026–27</div>
-                    <h1 class="brand-title">Self-Healing Software Ecosystem</h1>
+    <div class="app-container">
+        <!-- 1. Top Navbar: Clean & Minimal -->
+        <header class="top-nav">
+            <div class="nav-brand">
+                <div class="brand-badge">SH</div>
+                <div class="brand-info">
+                    <h1>Self-Healing Software Ecosystem</h1>
+                    <p class="brand-sub">Autonomous Observability, Causal RCA & Safe-RL Remediation</p>
                 </div>
             </div>
 
-            <div class="masthead-controls">
-                <div class="telemetry-pill" id="system-status-badge">
-                    <span class="pip pip-live"></span>
-                    <span class="pill-label" id="system-status-text">SYSTEM OPERATIONAL</span>
+            <div class="nav-meta">
+                <div class="status-pill" id="system-status-badge">
+                    <span class="pip pip-live" id="system-status-pip"></span>
+                    <span id="system-status-text">100 MICROSERVICES OPERATIONAL</span>
                 </div>
-                <div class="metadata-cluster">
-                    <div class="meta-item">
-                        <span class="meta-label">TOPOLOGY</span>
-                        <span class="meta-value">100 Microservices</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">CLUSTER</span>
-                        <span class="meta-value">8 K8s Nodes</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">INCIDENTS</span>
-                        <span class="meta-value" id="active-fault-pill">0 Active</span>
-                    </div>
-                    <div class="meta-item author-tag">
-                        <span class="meta-label">ENGINEER</span>
-                        <span class="meta-value">Dhruv Oswal (A70405223051)</span>
-                    </div>
+                <div class="engineer-tag">
+                    <span class="tag-label">AUTHOR</span>
+                    <span class="tag-val">Dhruv Oswal (A70405223051)</span>
                 </div>
             </div>
         </header>
 
-        <!-- 6-Stage Autonomous Closed-Loop Pipeline Stepper -->
-        <section class="stage-pipeline-panel">
-            <div class="panel-header">
-                <div class="header-prefix">
-                    <span class="prefix-tag">// CLOSED-LOOP OODA CYCLE</span>
-                    <h2>Autonomous Remediation Pipeline</h2>
-                </div>
-                <div class="header-actions">
-                    <button class="action-btn outline-btn" id="btn-step-stage" onclick="stepStage()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
-                        <span>STEP PIPELINE</span>
-                    </button>
-                    <button class="action-btn primary-btn" id="btn-auto-heal" onclick="triggerAutoHeal()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
-                        </svg>
-                        <span>AUTONOMOUS EXECUTION</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="pipeline-flow">
-                <div class="stage-tile" id="step-card-1" data-stage="1">
-                    <div class="tile-index">01</div>
-                    <div class="tile-body">
-                        <div class="tile-name">Multivariate Anomaly</div>
-                        <div class="tile-desc">OTel Traces &bull; LSTM-VAE Drift (z &gt; 3.2&sigma;)</div>
-                        <div class="tile-status" id="step-status-1">STANDBY</div>
+        <!-- 2. Hero Action & Control Hub -->
+        <section class="command-hub">
+            <div class="hub-controls">
+                <!-- Scenario Trigger Group -->
+                <div class="control-group">
+                    <span class="group-label">FAULT INJECTION</span>
+                    <div class="scenario-buttons">
+                        <button class="pill-btn danger" onclick="triggerChaos('db_pool_exhaustion', 'svc-066')">
+                            <span>Database Pool Exhaustion</span>
+                            <span class="btn-sub">svc-066 (Primary)</span>
+                        </button>
+                        <button class="pill-btn warning" onclick="triggerChaos('memory_leak', 'svc-020')">
+                            <span>Memory Leak</span>
+                            <span class="btn-sub">svc-020</span>
+                        </button>
+                        <button class="pill-btn warning" onclick="triggerChaos('cpu_hog', 'svc-018')">
+                            <span>CPU Starvation</span>
+                            <span class="btn-sub">svc-018</span>
+                        </button>
+                        <button class="pill-btn outline" onclick="clearChaos()">
+                            <span>Reset Baseline</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="stage-tile" id="step-card-2" data-stage="2">
-                    <div class="tile-index">02</div>
-                    <div class="tile-body">
-                        <div class="tile-name">Blast Radius DAG</div>
-                        <div class="tile-desc">Sub-graph Extraction (k-hop)</div>
-                        <div class="tile-status" id="step-status-2">STANDBY</div>
-                    </div>
-                </div>
-
-                <div class="stage-tile" id="step-card-3" data-stage="3">
-                    <div class="tile-index">03</div>
-                    <div class="tile-body">
-                        <div class="tile-name">Causal SCM & GATv2</div>
-                        <div class="tile-desc">Edge Attention &bull; do-calculus</div>
-                        <div class="tile-status" id="step-status-3">STANDBY</div>
-                    </div>
-                </div>
-
-                <div class="stage-tile" id="step-card-4" data-stage="4">
-                    <div class="tile-index">04</div>
-                    <div class="tile-body">
-                        <div class="tile-name">Digital Twin Sandbox</div>
-                        <div class="tile-desc">M/M/c Queuing Counterfactuals</div>
-                        <div class="tile-status" id="step-status-4">STANDBY</div>
-                    </div>
-                </div>
-
-                <div class="stage-tile" id="step-card-5" data-stage="5">
-                    <div class="tile-index">05</div>
-                    <div class="tile-body">
-                        <div class="tile-name">Safe-RL Execution</div>
-                        <div class="tile-desc">Safe-PPO (J_C &le; 0.05) &bull; etcd</div>
-                        <div class="tile-status" id="step-status-5">STANDBY</div>
-                    </div>
-                </div>
-
-                <div class="stage-tile" id="step-card-6" data-stage="6">
-                    <div class="tile-index">06</div>
-                    <div class="tile-body">
-                        <div class="tile-name">Canary & Rollback</div>
-                        <div class="tile-desc">Golden Signal Verification</div>
-                        <div class="tile-status" id="step-status-6">STANDBY</div>
+                <!-- Remediation Execution Group -->
+                <div class="control-group action-group">
+                    <span class="group-label">AUTONOMOUS REMEDIATION</span>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" id="btn-step-stage" onclick="stepStage()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <span>Step Next Stage</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-auto-heal" onclick="triggerAutoHeal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                            </svg>
+                            <span>Autonomous Auto-Heal</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="pipeline-ticker">
-                <span class="ticker-prefix">LOG //</span>
-                <span class="ticker-message" id="pipeline-status-text">System operating in steady state. Continuous OpenTelemetry scraping active.</span>
+            <!-- 6-Stage Runway Stepper -->
+            <div class="pipeline-runway">
+                <div class="runway-steps">
+                    <div class="runway-step" id="step-card-1">
+                        <div class="step-num">01</div>
+                        <div class="step-label">DETECT</div>
+                        <div class="step-desc">Multimodal Anomaly</div>
+                        <div class="step-status" id="step-status-1">STANDBY</div>
+                    </div>
+                    <div class="step-arrow">&rarr;</div>
+
+                    <div class="runway-step" id="step-card-2">
+                        <div class="step-num">02</div>
+                        <div class="step-label">ISOLATE</div>
+                        <div class="step-desc">Blast Radius DAG</div>
+                        <div class="step-status" id="step-status-2">STANDBY</div>
+                    </div>
+                    <div class="step-arrow">&rarr;</div>
+
+                    <div class="runway-step" id="step-card-3">
+                        <div class="step-num">03</div>
+                        <div class="step-label">DIAGNOSE</div>
+                        <div class="step-desc">GATv2 & Causal SCM</div>
+                        <div class="step-status" id="step-status-3">STANDBY</div>
+                    </div>
+                    <div class="step-arrow">&rarr;</div>
+
+                    <div class="runway-step" id="step-card-4">
+                        <div class="step-num">04</div>
+                        <div class="step-label">SIMULATE</div>
+                        <div class="step-desc">Digital Twin M/M/c</div>
+                        <div class="step-status" id="step-status-4">STANDBY</div>
+                    </div>
+                    <div class="step-arrow">&rarr;</div>
+
+                    <div class="runway-step" id="step-card-5">
+                        <div class="step-num">05</div>
+                        <div class="step-label">REMEDIATE</div>
+                        <div class="step-desc">Safe-PPO & K8s Patch</div>
+                        <div class="step-status" id="step-status-5">STANDBY</div>
+                    </div>
+                    <div class="step-arrow">&rarr;</div>
+
+                    <div class="runway-step" id="step-card-6">
+                        <div class="step-num">06</div>
+                        <div class="step-label">VERIFY</div>
+                        <div class="step-desc">Canary & Rollback Guard</div>
+                        <div class="step-status" id="step-status-6">STANDBY</div>
+                    </div>
+                </div>
+
+                <div class="runway-ticker">
+                    <span class="ticker-badge">PIPELINE LOG</span>
+                    <span class="ticker-text" id="pipeline-status-text">System operational in steady state. Continuous OpenTelemetry scraping active.</span>
+                </div>
             </div>
         </section>
 
-        <!-- Main Workspace Grid -->
-        <main class="workspace-grid">
-            <!-- Left Column: Dynamic Topology & Node Telemetry -->
-            <div class="column col-left">
-                <!-- Topology Graph Card -->
-                <div class="panel graph-panel">
-                    <div class="panel-header">
-                        <div class="header-prefix">
-                            <span class="prefix-tag">// DYNAMIC TOPOLOGY</span>
-                            <h3>Service Dependency Graph G_t = (V_t, E_t)</h3>
-                        </div>
-                        <div class="graph-legend-strip">
-                            <span class="legend-pip"><span class="pip pip-healthy"></span> Healthy</span>
-                            <span class="legend-pip"><span class="pip pip-degraded"></span> Degraded</span>
-                            <span class="legend-pip"><span class="pip pip-critical"></span> Root Culprit</span>
-                            <span class="legend-pip"><span class="pip pip-healing"></span> Remediation</span>
-                        </div>
-                    </div>
-                    <div id="network-topology-container" class="graph-viewport">
-                        <div class="viewport-loader">INITIALIZING TOPOLOGY FABRIC...</div>
-                    </div>
-                    <div class="viewport-toolbar">
-                        <span class="toolbar-hint">Select any node to inspect telemetry vector, ConfigMap, and HikariCP pool metrics.</span>
-                        <button class="micro-btn" onclick="resetGraphView()">RESET VIEW</button>
-                    </div>
+        <!-- 3. Key Golden Signals Summary -->
+        <section class="signals-strip">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">P99 TAIL LATENCY</span>
+                    <span class="metric-target">SLO &lt; 100ms</span>
+                </div>
+                <div class="metric-value-box">
+                    <span class="metric-main-value" id="metric-p99">45.0 <span class="unit">ms</span></span>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="chart-p99" height="45"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">GLOBAL ERROR RATE</span>
+                    <span class="metric-target">SLO &lt; 0.1%</span>
+                </div>
+                <div class="metric-value-box">
+                    <span class="metric-main-value" id="metric-error">0.08 <span class="unit">%</span></span>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="chart-error" height="45"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">ORDER-DB POOL SATURATION</span>
+                    <span class="metric-target">HikariCP Limit: 50</span>
+                </div>
+                <div class="metric-value-box">
+                    <span class="metric-main-value" id="metric-pool">30.0 <span class="unit">%</span></span>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="chart-pool" height="45"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">TOTAL CLUSTER THROUGHPUT</span>
+                    <span class="metric-target">100 Microservices</span>
+                </div>
+                <div class="metric-value-box">
+                    <span class="metric-main-value" id="metric-rps">3,850 <span class="unit">RPS</span></span>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="chart-rps" height="45"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Main Tabbed Workspace (Clean & De-cluttered) -->
+        <main class="workspace-tabs-container">
+            <!-- Navigation Tabs -->
+            <div class="tab-header">
+                <div class="tab-nav-buttons">
+                    <button class="tab-btn active" onclick="switchTab('tab-topology')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        <span>Dynamic Service Topology</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('tab-simulation')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                        </svg>
+                        <span>Digital Twin Simulation</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('tab-audit')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span>Incident Audit Ledger</span>
+                    </button>
                 </div>
 
-                <!-- Service Node Inspector -->
-                <div class="panel inspector-panel" id="service-inspector">
-                    <div class="panel-header">
-                        <div class="header-prefix">
-                            <span class="prefix-tag">// SERVICE INSPECTION</span>
-                            <h3 id="inspector-service-name">Order-DB-Adapter [svc-066]</h3>
+                <div class="tab-actions" id="tab-top-actions">
+                    <span class="view-toggle-label">TOPOLOGY VIEW:</span>
+                    <button class="micro-btn active" id="btn-toggle-view" onclick="toggleGraphFocus()">Blast Radius Focus</button>
+                    <button class="micro-btn" onclick="resetGraphView()">Center View</button>
+                </div>
+            </div>
+
+            <!-- Tab 1: Dynamic Service Topology & Service Inspector -->
+            <div class="tab-content active" id="tab-topology">
+                <div class="topology-layout">
+                    <!-- Graph Canvas -->
+                    <div class="graph-card">
+                        <div class="graph-card-header">
+                            <div class="graph-legend">
+                                <span class="legend-item"><span class="legend-pip healthy"></span> Healthy (Operational)</span>
+                                <span class="legend-item"><span class="legend-pip degraded"></span> Degraded (Victim Symptom)</span>
+                                <span class="legend-item"><span class="legend-pip culprit"></span> Root Culprit (Isolated)</span>
+                                <span class="legend-item"><span class="legend-pip healing"></span> Self-Healing</span>
+                            </div>
+                            <span class="graph-info-hint">Click any microservice node to inspect telemetry</span>
                         </div>
-                        <span class="status-chip chip-safe" id="inspector-service-status">HEALTHY</span>
+                        <div id="network-topology-container" class="graph-viewport">
+                            <div class="viewport-loader">INITIALIZING TOPOLOGY FABRIC...</div>
+                        </div>
                     </div>
-                    <div class="inspector-content">
-                        <div class="telemetry-bar-grid">
-                            <div class="metric-plate">
-                                <span class="plate-label">P99 TAIL LATENCY</span>
-                                <span class="plate-value" id="ins-p99">45.0 ms</span>
+
+                    <!-- Compact Service Inspector -->
+                    <div class="inspector-card">
+                        <div class="inspector-header">
+                            <div>
+                                <span class="inspector-badge">SERVICE INSPECTOR</span>
+                                <h3 id="inspector-service-name">Order-DB-Adapter [svc-066]</h3>
                             </div>
-                            <div class="metric-plate">
-                                <span class="plate-label">ERROR RATE</span>
-                                <span class="plate-value" id="ins-err">0.08%</span>
+                            <span class="status-chip chip-safe" id="inspector-service-status">HEALTHY</span>
+                        </div>
+
+                        <div class="inspector-metrics">
+                            <div class="ins-metric">
+                                <span class="ins-label">TAIL LATENCY (P99)</span>
+                                <span class="ins-val" id="ins-p99">45.0 ms</span>
                             </div>
-                            <div class="metric-plate">
-                                <span class="plate-label">DB POOL SATURATION</span>
-                                <span class="plate-value" id="ins-pool">15 / 50 (30%)</span>
+                            <div class="ins-metric">
+                                <span class="ins-label">ERROR RATE</span>
+                                <span class="ins-val" id="ins-err">0.08%</span>
                             </div>
-                            <div class="metric-plate">
-                                <span class="plate-label">POD REPLICAS</span>
-                                <span class="plate-value" id="ins-reps">3 Pods</span>
+                            <div class="ins-metric">
+                                <span class="ins-label">DB POOL USAGE</span>
+                                <span class="ins-val" id="ins-pool">15 / 50 (30%)</span>
+                            </div>
+                            <div class="ins-metric">
+                                <span class="ins-label">REPLICAS / HOST</span>
+                                <span class="ins-val" id="ins-reps">3 Pods</span>
                             </div>
                         </div>
 
-                        <div class="console-box">
-                            <div class="console-header">
-                                <span>LIVE SERVICE LOG STREAM</span>
-                                <span class="console-sub">HikariCP &bull; gRPC &bull; JVM</span>
+                        <div class="inspector-logs">
+                            <div class="logs-header">
+                                <span>LIVE LOG PREVIEW (HikariCP / JVM)</span>
                             </div>
-                            <pre class="console-output" id="ins-log-preview">[INFO] HikariPool-1 - Connection pool initialized with maximumPoolSize=50, idleTimeout=30000ms
+                            <pre class="logs-body" id="ins-log-preview">[INFO] HikariPool-1 - Connection pool initialized with maximumPoolSize=50, idleTimeout=30000ms
 [INFO] Dispatched 410 req/s to postgresql://order-cluster-primary:5432/orders</pre>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Golden Signals, Chaos Suite, Twin Sandbox & Ledger -->
-            <div class="column col-right">
-                <!-- Chaos Engineering Laboratory -->
-                <div class="panel chaos-panel">
-                    <div class="panel-header">
-                        <div class="header-prefix">
-                            <span class="prefix-tag">// CHAOS EXPERIMENTATION</span>
-                            <h3>Synthetic Fault Injection Suite</h3>
-                        </div>
-                        <span class="status-chip chip-neutral">CHAOS MESH</span>
+            <!-- Tab 2: Digital Twin Simulation -->
+            <div class="tab-content" id="tab-simulation">
+                <div class="panel-inner">
+                    <div class="panel-desc-box">
+                        <h3>Digital Twin Queuing Simulation & Safe-PPO Policy Ranking</h3>
+                        <p>Simulates candidate interventions in an M/M/c queuing sandbox prior to live execution. Evaluates projected latency drops against the constrained blast budget (J_C &le; 0.05).</p>
                     </div>
-                    <div class="chaos-matrix">
-                        <button class="chaos-tile danger" onclick="triggerChaos('db_pool_exhaustion', 'svc-066')">
-                            <div class="tile-top">
-                                <span class="scenario-index">FAULT 01</span>
-                                <span class="scenario-tag">PRIMARY CASE</span>
-                            </div>
-                            <div class="scenario-title">HikariCP Pool Exhaustion</div>
-                            <div class="scenario-meta">Order-DB-Adapter &bull; svc-066 &bull; SCM Isolation</div>
-                        </button>
 
-                        <button class="chaos-tile warning" onclick="triggerChaos('memory_leak', 'svc-020')">
-                            <div class="tile-top">
-                                <span class="scenario-index">FAULT 02</span>
-                                <span class="scenario-tag">HEAP LEAK</span>
-                            </div>
-                            <div class="scenario-title">Memory Leak & GC Thrash</div>
-                            <div class="scenario-meta">Payment-Settlement &bull; svc-020 &bull; Heap Saturation</div>
-                        </button>
-
-                        <button class="chaos-tile warning" onclick="triggerChaos('cpu_hog', 'svc-018')">
-                            <div class="tile-top">
-                                <span class="scenario-index">FAULT 03</span>
-                                <span class="scenario-tag">THREAD STARVATION</span>
-                            </div>
-                            <div class="scenario-title">CPU Thread Hogging</div>
-                            <div class="scenario-meta">Cart-State-Service &bull; svc-018 &bull; 98% Core Load</div>
-                        </button>
-
-                        <button class="chaos-tile warning" onclick="triggerChaos('retry_storm', 'svc-016')">
-                            <div class="tile-top">
-                                <span class="scenario-index">FAULT 04</span>
-                                <span class="scenario-tag">CASCADING RETRIES</span>
-                            </div>
-                            <div class="scenario-title">Cascading Retry Storm</div>
-                            <div class="scenario-meta">Checkout-API &bull; svc-016 &bull; 3.5x Inbound Load</div>
-                        </button>
-
-                        <button class="chaos-tile reset-tile" onclick="clearChaos()">
-                            <div class="tile-top">
-                                <span class="scenario-index">RESET</span>
-                                <span class="scenario-tag">STEADY STATE</span>
-                            </div>
-                            <div class="scenario-title">Restore Cluster Baseline</div>
-                            <div class="scenario-meta">Flush Injected Faults & Clear Active Incidents</div>
-                        </button>
-                    </div>
+                    <table class="clean-table">
+                        <thead>
+                            <tr>
+                                <th>REMEDIATION CANDIDATE</th>
+                                <th>PROJECTED &Delta;P99</th>
+                                <th>BLAST COST (c_t)</th>
+                                <th>SAFETY CONSTRAINT</th>
+                                <th>SAFE-PPO DECISION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="twin-actions-body">
+                            <tr class="action-selected">
+                                <td>
+                                    <div class="table-primary-text">RESIZE_DB_CONN_POOL</div>
+                                    <div class="table-sub-text">maxPoolSize: 50 &rarr; 120 &bull; leakDetect: 5s</div>
+                                </td>
+                                <td><span class="val-positive">-88.0%</span></td>
+                                <td><span class="code-pill">0.010</span></td>
+                                <td><span class="chip-safe">SAFE (&le;0.05)</span></td>
+                                <td><span class="chip-active">SELECTED</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="table-primary-text">HORIZONTAL_POD_AUTOSCALE</div>
+                                    <div class="table-sub-text">Replicas: 3 &rarr; 6 pods</div>
+                                </td>
+                                <td><span class="val-muted">-40.0%</span></td>
+                                <td><span class="code-pill">0.090</span></td>
+                                <td><span class="chip-breached">BREACHED</span></td>
+                                <td><span class="chip-muted">REJECTED</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="table-primary-text">GRACEFUL_POD_RESTART</div>
+                                    <div class="table-sub-text">Rolling container restart</div>
+                                </td>
+                                <td><span class="val-muted">-55.0%</span></td>
+                                <td><span class="code-pill">0.070</span></td>
+                                <td><span class="chip-breached">BREACHED</span></td>
+                                <td><span class="chip-muted">REJECTED</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="table-primary-text">CIRCUIT_BREAK</div>
+                                    <div class="table-sub-text">40% adaptive traffic shedding</div>
+                                </td>
+                                <td><span class="val-muted">-65.0%</span></td>
+                                <td><span class="code-pill">0.080</span></td>
+                                <td><span class="chip-breached">BREACHED</span></td>
+                                <td><span class="chip-muted">REJECTED</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <!-- Golden Signals Telemetry -->
-                <div class="panel metrics-panel">
-                    <div class="panel-header">
-                        <div class="header-prefix">
-                            <span class="prefix-tag">// OBSERVED TELEMETRY</span>
-                            <h3>Full-Stack Golden Signals</h3>
+            <!-- Tab 3: Incident Audit Ledger -->
+            <div class="tab-content" id="tab-audit">
+                <div class="panel-inner">
+                    <div class="panel-desc-box audit-header-box">
+                        <div>
+                            <h3>Closed-Loop Incident Post-Mortem Ledger</h3>
+                            <p>Immutable audit trail of autonomous detections, causal diagnoses, executed Kubernetes patches, and canary verification verdicts.</p>
                         </div>
-                        <span class="live-tag"><span class="pip pip-live"></span> STREAMING 1Hz</span>
+                        <button class="btn btn-outline small" onclick="exportAuditLedger()">Export Audit JSON</button>
                     </div>
 
-                    <div class="signals-grid">
-                        <div class="signal-card">
-                            <div class="signal-meta">P99 TAIL LATENCY</div>
-                            <div class="signal-number" id="metric-p99">42.5 <span class="unit">ms</span></div>
-                            <div class="sparkline-container">
-                                <canvas id="chart-p99" height="55"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="signal-card">
-                            <div class="signal-meta">GLOBAL ERROR RATE</div>
-                            <div class="signal-number" id="metric-error">0.08 <span class="unit">%</span></div>
-                            <div class="sparkline-container">
-                                <canvas id="chart-error" height="55"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="signal-card">
-                            <div class="signal-meta">ORDER-DB POOL SATURATION</div>
-                            <div class="signal-number" id="metric-pool">30.0 <span class="unit">%</span></div>
-                            <div class="sparkline-container">
-                                <canvas id="chart-pool" height="55"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="signal-card">
-                            <div class="signal-meta">INBOUND THROUGHPUT</div>
-                            <div class="signal-number" id="metric-rps">3,850 <span class="unit">RPS</span></div>
-                            <div class="sparkline-container">
-                                <canvas id="chart-rps" height="55"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Digital Twin & Safe-RL Counterfactual Sandbox -->
-                <div class="panel twin-panel" id="digital-twin-card">
-                    <div class="panel-header">
-                        <div class="header-prefix">
-                            <span class="prefix-tag">// COUNTERFACTUAL SIMULATION</span>
-                            <h3>Digital Twin & Safe-PPO Policy Ranking</h3>
-                        </div>
-                        <span class="status-chip chip-gold">BLAST BUDGET &le; 0.05</span>
-                    </div>
-                    <div class="table-frame">
-                        <table class="editorial-table">
-                            <thead>
-                                <tr>
-                                    <th>REMEDIATION PRIMITIVE</th>
-                                    <th>PROJECTED &Delta;P99</th>
-                                    <th>BLAST COST (c_t)</th>
-                                    <th>SAFETY BUDGET</th>
-                                    <th>DECISION VERDICT</th>
-                                </tr>
-                            </thead>
-                            <tbody id="twin-actions-body">
-                                <tr class="action-selected">
-                                    <td>
-                                        <div class="prim-title">RESIZE_DB_CONN_POOL</div>
-                                        <div class="prim-meta">maxPoolSize: 50 &rarr; 120 &bull; leakDetect: 5s</div>
-                                    </td>
-                                    <td><span class="val-positive">-88.0%</span></td>
-                                    <td><span class="mono-code">0.010</span></td>
-                                    <td><span class="status-chip chip-safe">SAFE (&le;0.05)</span></td>
-                                    <td><span class="status-chip chip-selected">SELECTED</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="prim-title">HORIZONTAL_POD_AUTOSCALE</div>
-                                        <div class="prim-meta">Replicas: 3 &rarr; 6 pods</div>
-                                    </td>
-                                    <td><span class="val-muted">-40.0%</span></td>
-                                    <td><span class="mono-code">0.090</span></td>
-                                    <td><span class="status-chip chip-breached">BREACHED</span></td>
-                                    <td><span class="status-chip chip-rejected">REJECTED</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="prim-title">GRACEFUL_POD_RESTART</div>
-                                        <div class="prim-meta">Rolling container rollout</div>
-                                    </td>
-                                    <td><span class="val-muted">-55.0%</span></td>
-                                    <td><span class="mono-code">0.070</span></td>
-                                    <td><span class="status-chip chip-breached">BREACHED</span></td>
-                                    <td><span class="status-chip chip-rejected">REJECTED</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="prim-title">CIRCUIT_BREAK</div>
-                                        <div class="prim-meta">40% adaptive traffic shedding</div>
-                                    </td>
-                                    <td><span class="val-muted">-65.0%</span></td>
-                                    <td><span class="mono-code">0.080</span></td>
-                                    <td><span class="status-chip chip-breached">BREACHED</span></td>
-                                    <td><span class="status-chip chip-rejected">REJECTED</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Incident Audit & Post-Mortem Ledger -->
-                <div class="panel audit-panel">
-                    <div class="panel-header">
-                        <div class="header-prefix">
-                            <span class="prefix-tag">// INCIDENT AUDIT LEDGER</span>
-                            <h3>Closed-Loop Incident Post-Mortems</h3>
-                        </div>
-                        <button class="micro-btn" onclick="exportAuditLedger()">EXPORT REPORT (.JSON)</button>
-                    </div>
-                    <div class="table-frame scrollable-frame">
-                        <table class="editorial-table">
-                            <thead>
-                                <tr>
-                                    <th>INCIDENT ID</th>
-                                    <th>ROOT CAUSE</th>
-                                    <th>CONFIDENCE</th>
-                                    <th>REMEDIATION</th>
-                                    <th>MTTD</th>
-                                    <th>MTTR</th>
-                                    <th>VERDICT</th>
-                                </tr>
-                            </thead>
-                            <tbody id="incident-ledger-body">
-                                <tr>
-                                    <td colspan="7" class="empty-state">No incidents logged. Execute a synthetic fault above to initiate the autonomous cycle.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="clean-table">
+                        <thead>
+                            <tr>
+                                <th>INCIDENT ID</th>
+                                <th>CULPRIT SERVICE</th>
+                                <th>CAUSAL CONFIDENCE</th>
+                                <th>EXECUTED REMEDIATION</th>
+                                <th>MTTD</th>
+                                <th>MTTR</th>
+                                <th>VERDICT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incident-ledger-body">
+                            <tr>
+                                <td colspan="7" class="empty-state">No incidents logged yet. Trigger a synthetic fault above to initiate the autonomous self-healing cycle.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>
     </div>
 
     <!-- Live Application JavaScript -->
-    <script src="/static/js/app.js?v=black-orange-blue.1.0"></script>
+    <script src="/static/js/app.js?v=revamp.1.0"></script>
 </body>
 </html>
