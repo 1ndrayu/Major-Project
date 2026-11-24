@@ -13,6 +13,10 @@ let currentSelectedNodeId = "svc-066";
 let currentStage = 1;
 let isAutoHealingActive = false;
 let isFocusMode = true; // Default to clean blast-radius focus
+let simActiveFaults = {};
+let simIncidents = [];
+let isLocalSimMode = false;
+let simInterval = null;
 
 // Chart instances
 let chartP99 = null;
@@ -187,8 +191,24 @@ function updateChartData(p99, errorRate, poolSat, rps) {
 // -------------------------------------------------------------
 async function loadTopology() {
     try {
-        const resp = await fetch("/api/cluster/topology");
-        const data = await resp.json();
+        let data = null;
+        try {
+            const resp = await fetch("/api/cluster/topology");
+            if (resp.ok) data = await resp.json();
+        } catch (e) {}
+
+        if (!data) {
+            // Static hosting fallback (GitHub Pages)
+            isLocalSimMode = true;
+            try {
+                const resp = await fetch("./static/data/topology.json");
+                if (resp.ok) data = await resp.json();
+            } catch (e) {}
+        }
+
+        if (!data) {
+            data = generateFallbackCluster();
+        }
 
         allNodesCache = data.nodes;
         allEdgesCache = data.edges;
@@ -200,9 +220,89 @@ async function loadTopology() {
         renderGraph();
         selectService("svc-066");
 
+        if (isLocalSimMode) {
+            startLocalSimulationLoop();
+        }
+
     } catch (e) {
         console.error("Failed to load topology:", e);
     }
+}
+
+function startLocalSimulationLoop() {
+    if (simInterval) return;
+    simInterval = setInterval(() => {
+        const faultCount = Object.keys(simActiveFaults).length;
+        let baseP99, baseErr, basePool, baseRps;
+
+        if (faultCount > 0) {
+            const isDb = !!simActiveFaults["svc-066"];
+            baseP99 = isDb ? (780 + Math.random() * 90) : (410 + Math.random() * 60);
+            baseErr = 0.084 + Math.random() * 0.025;
+            basePool = isDb ? 0.98 : 0.45;
+            baseRps = 1420 + Math.floor(Math.random() * 60);
+        } else {
+            baseP99 = 42.5 + Math.sin(Date.now() / 4000) * 8.5;
+            baseErr = 0.0008 + Math.random() * 0.0005;
+            basePool = 0.28 + Math.sin(Date.now() / 6000) * 0.04;
+            baseRps = 1450 + Math.floor(Math.random() * 50);
+        }
+
+        updateChartData(baseP99, baseErr, basePool, baseRps);
+
+        const badgeText = document.getElementById("system-status-text");
+        const pip = document.getElementById("system-status-pip");
+        if (badgeText && pip) {
+            if (faultCount === 0) {
+                badgeText.textContent = "All 100 Services Operational";
+                pip.className = "status-dot healthy";
+            } else {
+                badgeText.textContent = `Incident Active • ${faultCount} Active Fault${faultCount === 1 ? '' : 's'}`;
+                pip.className = "status-dot critical";
+            }
+        }
+    }, 1000);
+}
+
+function generateFallbackCluster() {
+    const nodes = [];
+    const edges = [];
+    const tiers = ["GATEWAY", "INGRESS", "AUTH", "CART", "PAYMENT", "ORDER", "INVENTORY", "NOTIFICATION", "DATABASE"];
+    
+    for (let i = 1; i <= 100; i++) {
+        const id = `svc-${String(i).padStart(3, '0')}`;
+        const tier = i <= 2 ? "GATEWAY" : (i <= 5 ? "INGRESS" : (i >= 90 ? "DATABASE" : tiers[i % tiers.length]));
+        const name = i === 66 ? "Order-DB-Adapter" : (i === 1 ? "API-Gateway" : (i === 16 ? "Checkout-API" : (i === 20 ? "Payment-Settlement" : `Service-${i}`)));
+        
+        nodes.push({
+            id: id,
+            name: name,
+            tier: tier,
+            host_node: `k8s-worker-${(i % 8) + 1}`,
+            status: "HEALTHY",
+            p99_latency_ms: 35.0 + (i % 20),
+            error_rate: 0.001,
+            request_rate_rps: 120.0 + (i % 50),
+            cpu_usage_pct: 25.0 + (i % 30),
+            memory_usage_pct: 40.0 + (i % 25),
+            db_pool_active: tier === "DATABASE" ? 12 : 0,
+            db_pool_max: tier === "DATABASE" ? 50 : 0,
+            replicas: tier === "GATEWAY" ? 6 : 3,
+            active_fault: null
+        });
+        
+        if (i > 1 && i <= 88) {
+            const parentId = `svc-${String(Math.max(1, Math.floor(i / 2))).padStart(3, '0')}`;
+            edges.push({
+                source: parentId,
+                target: id,
+                p99_latency_ms: 12.0 + (i % 15),
+                error_rate: 0.0005,
+                throughput_rps: 65.0
+            });
+        }
+    }
+    return { nodes, edges, total_nodes: 100, total_edges: edges.length, active_faults: {} };
 }
 
 function renderGraph() {
@@ -361,59 +461,92 @@ function selectService(serviceId) {
 // -------------------------------------------------------------
 function initWebSocket() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws/live-stream`;
-    const ws = new WebSocket(wsUrl);
+    const host = window.location.host;
+    if (!host || host.includes("github.io") || window.location.protocol === "file:") {
+        // Pure static environment: run local simulation engine
+        isLocalSimMode = true;
+        startLocalSimulationLoop();
+        return;
+    }
 
-    ws.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            if (data.type === "TELEMETRY_UPDATE") {
-                // Update ticker only if idle
-                if (!isAutoHealingActive && currentStage === 1 && data.current_stage === 1) {
-                    const ticker = document.getElementById("pipeline-status-text");
-                    if (ticker && (!ticker.textContent || ticker.textContent.includes("operational") || ticker.textContent.includes("steady"))) {
-                        ticker.textContent = data.status_message;
+    try {
+        const wsUrl = `${protocol}//${host}/ws/live-stream`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+            isLocalSimMode = false;
+            if (simInterval) {
+                clearInterval(simInterval);
+                simInterval = null;
+            }
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === "TELEMETRY_UPDATE") {
+                    if (!isAutoHealingActive && currentStage === 1 && data.current_stage === 1) {
+                        const ticker = document.getElementById("pipeline-status-text");
+                        if (ticker && (!ticker.textContent || ticker.textContent.includes("operational") || ticker.textContent.includes("steady"))) {
+                            ticker.textContent = data.status_message;
+                        }
+                    }
+
+                    const orderDbPoolSat = nodeLookup["svc-066"] ? (nodeLookup["svc-066"].db_pool_active / Math.max(1, nodeLookup["svc-066"].db_pool_max)) : 0.3;
+                    updateChartData(data.system_p99_ms, data.system_error_rate, orderDbPoolSat, data.system_total_rps);
+
+                    const faultCount = Object.keys(data.active_faults).length;
+                    const badgeText = document.getElementById("system-status-text");
+                    const pip = document.getElementById("system-status-pip");
+
+                    if (faultCount === 0) {
+                        badgeText.textContent = "All 100 Services Operational";
+                        pip.className = "status-dot healthy";
+                    } else {
+                        badgeText.textContent = `Incident Active • ${faultCount} Active Fault${faultCount === 1 ? '' : 's'}`;
+                        pip.className = "status-dot critical";
+                    }
+
+                    if (data.active_faults) {
+                        refreshTopologyStatus(data.active_faults);
                     }
                 }
-
-                // Update charts
-                const orderDbPoolSat = nodeLookup["svc-066"] ? (nodeLookup["svc-066"].db_pool_active / Math.max(1, nodeLookup["svc-066"].db_pool_max)) : 0.3;
-                updateChartData(data.system_p99_ms, data.system_error_rate, orderDbPoolSat, data.system_total_rps);
-
-                // Update status badge
-                const faultCount = Object.keys(data.active_faults).length;
-                const badgeText = document.getElementById("system-status-text");
-                const pip = document.getElementById("system-status-pip");
-
-                if (faultCount === 0) {
-                    badgeText.textContent = "All 100 Services Operational";
-                    pip.className = "status-dot healthy";
-                } else {
-                    badgeText.textContent = `Incident Active • ${faultCount} Active Fault${faultCount === 1 ? '' : 's'}`;
-                    pip.className = "status-dot critical";
-                }
-
-                if (data.active_faults) {
-                    refreshTopologyStatus(data.active_faults);
-                }
+            } catch (e) {
+                console.error("Error parsing WS message:", e);
             }
-        } catch (e) {
-            console.error("Error parsing WS message:", e);
-        }
-    };
+        };
 
-    ws.onclose = () => {
-        setTimeout(initWebSocket, 3000);
-    };
+        ws.onerror = () => {
+            if (!isLocalSimMode) {
+                isLocalSimMode = true;
+                startLocalSimulationLoop();
+            }
+        };
+
+        ws.onclose = () => {
+            if (!isLocalSimMode) {
+                setTimeout(initWebSocket, 4000);
+            }
+        };
+    } catch (e) {
+        isLocalSimMode = true;
+        startLocalSimulationLoop();
+    }
 }
 
 async function refreshTopologyStatus(activeFaults) {
     try {
-        const resp = await fetch("/api/cluster/topology");
-        const data = await resp.json();
-        allNodesCache = data.nodes;
+        let nodesToUpdate = allNodesCache;
+        try {
+            const resp = await fetch("/api/cluster/topology");
+            if (resp.ok) {
+                const data = await resp.json();
+                allNodesCache = data.nodes;
+                nodesToUpdate = data.nodes;
+            }
+        } catch (e) {}
 
-        data.nodes.forEach(n => {
+        nodesToUpdate.forEach(n => {
             nodeLookup[n.id] = n;
             if (networkData.nodes && networkData.nodes.get(n.id)) {
                 let bgColor = "#14171d";
@@ -451,6 +584,15 @@ async function refreshTopologyStatus(activeFaults) {
 // -------------------------------------------------------------
 // 5. Runway Stepper & Autonomous Loop
 // -------------------------------------------------------------
+const SIMULATED_STAGES = {
+    1: { message: "Anomaly detected via multimodal telemetry (z = 3.42σ). Initiating blast radius isolation.", primary_service: "svc-066" },
+    2: { message: "Dynamic G_t subgraph extracted. Blast radius isolated to 4 downstream services.", culprit_service: "svc-066" },
+    3: { message: "GATv2 Causal RCA completed. Root culprit identified: Order-DB-Adapter (svc-066) with 94.0% confidence.", culprit_service: "svc-066" },
+    4: { message: "Digital Twin simulated 3 candidate policies. Policy #1 (DB pool expansion) verified safe.", target_service: "svc-066" },
+    5: { message: "Safe-RL policy PATCH_HIKARICP_POOL applied: max=80, timeout=10s. Atomic rollback checkpoint primed.", target_service: "svc-066" },
+    6: { message: "Canary verification PASSED: p99 latency returned to 38.4ms, error rate 0.00%. Incident closed.", target_service: "svc-066" }
+};
+
 function setPipelineStage(stageNum, message) {
     currentStage = stageNum;
     for (let i = 1; i <= 6; i++) {
@@ -485,12 +627,39 @@ async function stepStage() {
     try {
         setPipelineStage(stageToRun, `Executing Stage 0${stageToRun}...`);
 
-        const resp = await fetch("/api/self-heal/step", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stage: stageToRun })
-        });
-        const res = await resp.json();
+        let res = null;
+        try {
+            const resp = await fetch("/api/self-heal/step", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ stage: stageToRun })
+            });
+            if (resp.ok) res = await resp.json();
+        } catch (e) {}
+
+        if (!res) {
+            res = SIMULATED_STAGES[stageToRun] || { message: `Stage 0${stageToRun} completed.` };
+            if (stageToRun === 5 && nodeLookup["svc-066"]) {
+                nodeLookup["svc-066"].status = "SELF_HEALING";
+            } else if (stageToRun === 6) {
+                simActiveFaults = {};
+                allNodesCache.forEach(n => {
+                    n.status = "HEALTHY";
+                    n.active_fault = null;
+                    n.p99_latency_ms = 38.4;
+                    n.error_rate = 0.0002;
+                    if (n.db_pool_max) n.db_pool_active = 14;
+                });
+                simIncidents.unshift({
+                    incident_id: "INC-" + Math.floor(1000 + Math.random() * 9000),
+                    culprit_service: "svc-066",
+                    remediation_action: "PATCH_HIKARICP_POOL(max=80)",
+                    mttd_sec: 1.4,
+                    mttr_sec: 4.8,
+                    verdict: "PASSED"
+                });
+            }
+        }
 
         if (res.primary_service) selectService(res.primary_service);
         if (res.culprit_service) selectService(res.culprit_service);
@@ -538,12 +707,39 @@ async function triggerAutoHeal() {
         for (let s = 1; s <= 6; s++) {
             setPipelineStage(s, `Executing Stage 0${s} in automated remediation pipeline...`);
 
-            const resp = await fetch("/api/self-heal/step", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ stage: s })
-            });
-            const res = await resp.json();
+            let res = null;
+            try {
+                const resp = await fetch("/api/self-heal/step", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ stage: s })
+                });
+                if (resp.ok) res = await resp.json();
+            } catch (e) {}
+
+            if (!res) {
+                res = SIMULATED_STAGES[s] || { message: `Stage 0${s} completed.` };
+                if (s === 5 && nodeLookup["svc-066"]) {
+                    nodeLookup["svc-066"].status = "SELF_HEALING";
+                } else if (s === 6) {
+                    simActiveFaults = {};
+                    allNodesCache.forEach(n => {
+                        n.status = "HEALTHY";
+                        n.active_fault = null;
+                        n.p99_latency_ms = 38.4;
+                        n.error_rate = 0.0002;
+                        if (n.db_pool_max) n.db_pool_active = 14;
+                    });
+                    simIncidents.unshift({
+                        incident_id: "INC-" + Math.floor(1000 + Math.random() * 9000),
+                        culprit_service: "svc-066",
+                        remediation_action: "PATCH_HIKARICP_POOL(max=80)",
+                        mttd_sec: 1.4,
+                        mttr_sec: 4.8,
+                        verdict: "PASSED"
+                    });
+                }
+            }
 
             if (res.primary_service) selectService(res.primary_service);
             if (res.culprit_service) selectService(res.culprit_service);
@@ -552,7 +748,7 @@ async function triggerAutoHeal() {
             document.getElementById("pipeline-status-text").textContent = res.message;
             refreshTopologyStatus({});
 
-            if (s < 6) await sleep(900);
+            if (s < 6) await sleep(800);
         }
 
         for (let i = 1; i <= 6; i++) {
@@ -581,30 +777,73 @@ async function triggerAutoHeal() {
 // -------------------------------------------------------------
 async function triggerChaos(scenario, target) {
     try {
-        const resp = await fetch("/api/chaos/inject", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ scenario, target_service: target })
-        });
-        const res = await resp.json();
-        setPipelineStage(1, `FAULT INJECTED // ${res.details.description} on ${res.details.target_name}`);
+        let handledByBackend = false;
+        try {
+            const resp = await fetch("/api/chaos/inject", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ scenario, target_service: target })
+            });
+            if (resp.ok) {
+                const res = await resp.json();
+                setPipelineStage(1, `FAULT INJECTED // ${res.details.description} on ${res.details.target_name}`);
+                handledByBackend = true;
+            }
+        } catch (e) {}
+
+        if (!handledByBackend) {
+            simActiveFaults[target] = scenario;
+            if (nodeLookup[target]) {
+                nodeLookup[target].status = "CRITICAL";
+                nodeLookup[target].active_fault = scenario.toUpperCase();
+                if (scenario === "db_pool_exhaustion") {
+                    nodeLookup[target].db_pool_active = nodeLookup[target].db_pool_max;
+                    nodeLookup[target].p99_latency_ms = 840.5;
+                    nodeLookup[target].error_rate = 0.125;
+                } else if (scenario === "cpu_starvation") {
+                    nodeLookup[target].cpu_usage_pct = 99.4;
+                    nodeLookup[target].p99_latency_ms = 620.0;
+                }
+            }
+
+            allEdgesCache.forEach(e => {
+                if (e.target === target && nodeLookup[e.source]) {
+                    nodeLookup[e.source].status = "DEGRADED";
+                    nodeLookup[e.source].p99_latency_ms = 380.0;
+                }
+            });
+
+            setPipelineStage(1, `FAULT INJECTED // ${scenario.toUpperCase().replace(/_/g, ' ')} on ${target}`);
+            startLocalSimulationLoop();
+        }
+
         selectService(target);
         refreshTopologyStatus({});
-        // Switch to topology tab automatically if not already there
         switchTab('tab-topology');
     } catch (e) {
-        alert("Failed to inject fault: " + e);
+        console.error("Failed to inject fault:", e);
     }
 }
 
 async function clearChaos() {
     try {
-        const resp = await fetch("/api/chaos/clear", { method: "POST" });
-        const res = await resp.json();
+        try {
+            await fetch("/api/chaos/clear", { method: "POST" });
+        } catch (e) {}
+
+        simActiveFaults = {};
+        allNodesCache.forEach(n => {
+            n.status = "HEALTHY";
+            n.active_fault = null;
+            n.p99_latency_ms = 35.0 + Math.random() * 10;
+            n.error_rate = 0.0008;
+            if (n.db_pool_max) n.db_pool_active = Math.floor(n.db_pool_max * 0.28);
+        });
+
         setPipelineStage(1, "Cluster baseline restored. Active faults cleared.");
         refreshTopologyStatus({});
     } catch (e) {
-        alert("Failed to clear chaos: " + e);
+        console.error("Failed to clear chaos:", e);
     }
 }
 
@@ -613,16 +852,28 @@ async function clearChaos() {
 // -------------------------------------------------------------
 async function refreshLedger() {
     try {
-        const resp = await fetch("/api/audit/incidents");
-        const data = await resp.json();
-        const tbody = document.getElementById("incident-ledger-body");
+        let incidents = [];
+        try {
+            const resp = await fetch("/api/audit/incidents");
+            if (resp.ok) {
+                const data = await resp.json();
+                incidents = data.incidents || [];
+            }
+        } catch (e) {}
 
-        if (!data.incidents || data.incidents.length === 0) {
+        if (incidents.length === 0 && simIncidents.length > 0) {
+            incidents = simIncidents;
+        }
+
+        const tbody = document.getElementById("incident-ledger-body");
+        if (!tbody) return;
+
+        if (incidents.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No incidents logged. Execute a failure simulation above to observe the automated remediation workflow.</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = data.incidents.map(inc => `
+        tbody.innerHTML = incidents.map(inc => `
             <tr>
                 <td><span class="mono-tag">${inc.incident_id}</span></td>
                 <td><strong style="color:var(--accent-orange)">${inc.culprit_service}</strong></td>
