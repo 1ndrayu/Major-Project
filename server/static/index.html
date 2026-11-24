@@ -4,204 +4,229 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Autonomous Self-Healing Software Ecosystem | Control Plane</title>
-    <!-- Fonts -->
+    <title>Cluster Reliability Platform | Incident Remediation</title>
+    <!-- Enterprise Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Vis.js & Chart.js -->
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/static/css/style.css?v=revamp.1.0">
+    <link rel="stylesheet" href="/static/css/style.css?v=b2b.3.0">
 </head>
 <body>
-    <div class="app-container">
-        <!-- 1. Top Navbar: Clean & Minimal -->
-        <header class="top-nav">
-            <div class="nav-brand">
-                <div class="brand-badge">SH</div>
-                <div class="brand-info">
-                    <h1>Self-Healing Software Ecosystem</h1>
-                    <p class="brand-sub">Autonomous Observability, Causal RCA & Safe-RL Remediation</p>
+    <div class="saas-layout">
+        <!-- Top Application Navigation -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <div class="app-titles">
+                    <div class="app-title">Cluster Reliability Platform</div>
+                    <div class="app-env">Production Mesh &bull; us-east-1</div>
                 </div>
             </div>
 
-            <div class="nav-meta">
-                <div class="status-pill" id="system-status-badge">
-                    <span class="pip pip-live" id="system-status-pip"></span>
-                    <span id="system-status-text">100 MICROSERVICES OPERATIONAL</span>
+            <div class="header-right">
+                <div class="system-status-badge" id="system-status-badge">
+                    <span class="status-dot healthy" id="system-status-pip"></span>
+                    <span class="status-text" id="system-status-text">All 100 Services Operational</span>
                 </div>
-                <div class="engineer-tag">
-                    <span class="tag-label">AUTHOR</span>
-                    <span class="tag-val">Dhruv Oswal (A70405223051)</span>
+                <div class="user-profile">
+                    <span class="user-role">SRE Lead</span>
+                    <span class="user-name">Dhruv Oswal (A70405223051)</span>
                 </div>
             </div>
         </header>
 
-        <!-- 2. Hero Action & Control Hub -->
-        <section class="command-hub">
-            <div class="hub-controls">
-                <!-- Scenario Trigger Group -->
-                <div class="control-group">
-                    <span class="group-label">FAULT INJECTION</span>
-                    <div class="scenario-buttons">
-                        <button class="pill-btn danger" onclick="triggerChaos('db_pool_exhaustion', 'svc-066')">
+        <!-- Command Toolbar & Remediation Workflow -->
+        <section class="workflow-card">
+            <div class="toolbar-top">
+                <!-- Fault Injection Actions (Orange Accent) -->
+                <div class="toolbar-section">
+                    <span class="toolbar-label">SIMULATE FAILURE INCIDENT</span>
+                    <div class="button-row">
+                        <button class="btn btn-incident" onclick="triggerChaos('db_pool_exhaustion', 'svc-066')">
+                            <span class="incident-badge">P1</span>
                             <span>Database Pool Exhaustion</span>
-                            <span class="btn-sub">svc-066 (Primary)</span>
+                            <span class="target-tag">svc-066</span>
                         </button>
-                        <button class="pill-btn warning" onclick="triggerChaos('memory_leak', 'svc-020')">
-                            <span>Memory Leak</span>
-                            <span class="btn-sub">svc-020</span>
+                        <button class="btn btn-incident" onclick="triggerChaos('memory_leak', 'svc-020')">
+                            <span class="incident-badge">P2</span>
+                            <span>Memory Leak & GC</span>
+                            <span class="target-tag">svc-020</span>
                         </button>
-                        <button class="pill-btn warning" onclick="triggerChaos('cpu_hog', 'svc-018')">
-                            <span>CPU Starvation</span>
-                            <span class="btn-sub">svc-018</span>
+                        <button class="btn btn-incident" onclick="triggerChaos('cpu_hog', 'svc-018')">
+                            <span class="incident-badge">P2</span>
+                            <span>CPU Saturation</span>
+                            <span class="target-tag">svc-018</span>
                         </button>
-                        <button class="pill-btn outline" onclick="clearChaos()">
+                        <button class="btn btn-secondary" onclick="clearChaos()">
                             <span>Reset Baseline</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Remediation Execution Group -->
-                <div class="control-group action-group">
-                    <span class="group-label">AUTONOMOUS REMEDIATION</span>
-                    <div class="action-buttons">
-                        <button class="btn btn-outline" id="btn-step-stage" onclick="stepStage()">
+                <!-- Remediation Execution Actions (Blue Accent) -->
+                <div class="toolbar-section align-right">
+                    <span class="toolbar-label">AUTOMATED REMEDIATION CONTROLS</span>
+                    <div class="button-row">
+                        <button class="btn btn-secondary" id="btn-step-stage" onclick="stepStage()">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
                             </svg>
-                            <span>Step Next Stage</span>
+                            <span>Step Execution</span>
                         </button>
-                        <button class="btn btn-primary" id="btn-auto-heal" onclick="triggerAutoHeal()">
+                        <button class="btn btn-primary-blue" id="btn-auto-heal" onclick="triggerAutoHeal()">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
                             </svg>
-                            <span>Autonomous Auto-Heal</span>
+                            <span>Run Automated Remediation</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 6-Stage Runway Stepper -->
-            <div class="pipeline-runway">
-                <div class="runway-steps">
-                    <div class="runway-step" id="step-card-1">
-                        <div class="step-num">01</div>
-                        <div class="step-label">DETECT</div>
-                        <div class="step-desc">Multimodal Anomaly</div>
-                        <div class="step-status" id="step-status-1">STANDBY</div>
+            <!-- Clean Remediation Workflow Stepper -->
+            <div class="workflow-stepper">
+                <div class="stepper-stages">
+                    <div class="stage-item" id="step-card-1">
+                        <div class="stage-header">
+                            <span class="stage-index">01</span>
+                            <span class="stage-status" id="step-status-1">Standby</span>
+                        </div>
+                        <div class="stage-title">Detection</div>
+                        <div class="stage-detail">OTel & LSTM-VAE (z > 3.2σ)</div>
                     </div>
-                    <div class="step-arrow">&rarr;</div>
 
-                    <div class="runway-step" id="step-card-2">
-                        <div class="step-num">02</div>
-                        <div class="step-label">ISOLATE</div>
-                        <div class="step-desc">Blast Radius DAG</div>
-                        <div class="step-status" id="step-status-2">STANDBY</div>
+                    <div class="stage-separator"></div>
+
+                    <div class="stage-item" id="step-card-2">
+                        <div class="stage-header">
+                            <span class="stage-index">02</span>
+                            <span class="stage-status" id="step-status-2">Standby</span>
+                        </div>
+                        <div class="stage-title">Isolation</div>
+                        <div class="stage-detail">Blast Radius Graph G_sub</div>
                     </div>
-                    <div class="step-arrow">&rarr;</div>
 
-                    <div class="runway-step" id="step-card-3">
-                        <div class="step-num">03</div>
-                        <div class="step-label">DIAGNOSE</div>
-                        <div class="step-desc">GATv2 & Causal SCM</div>
-                        <div class="step-status" id="step-status-3">STANDBY</div>
+                    <div class="stage-separator"></div>
+
+                    <div class="stage-item" id="step-card-3">
+                        <div class="stage-header">
+                            <span class="stage-index">03</span>
+                            <span class="stage-status" id="step-status-3">Standby</span>
+                        </div>
+                        <div class="stage-title">Root Cause</div>
+                        <div class="stage-detail">GATv2 & Causal SCM</div>
                     </div>
-                    <div class="step-arrow">&rarr;</div>
 
-                    <div class="runway-step" id="step-card-4">
-                        <div class="step-num">04</div>
-                        <div class="step-label">SIMULATE</div>
-                        <div class="step-desc">Digital Twin M/M/c</div>
-                        <div class="step-status" id="step-status-4">STANDBY</div>
+                    <div class="stage-separator"></div>
+
+                    <div class="stage-item" id="step-card-4">
+                        <div class="stage-header">
+                            <span class="stage-index">04</span>
+                            <span class="stage-status" id="step-status-4">Standby</span>
+                        </div>
+                        <div class="stage-title">Simulation</div>
+                        <div class="stage-detail">M/M/c Queuing Digital Twin</div>
                     </div>
-                    <div class="step-arrow">&rarr;</div>
 
-                    <div class="runway-step" id="step-card-5">
-                        <div class="step-num">05</div>
-                        <div class="step-label">REMEDIATE</div>
-                        <div class="step-desc">Safe-PPO & K8s Patch</div>
-                        <div class="step-status" id="step-status-5">STANDBY</div>
+                    <div class="stage-separator"></div>
+
+                    <div class="stage-item" id="step-card-5">
+                        <div class="stage-header">
+                            <span class="stage-index">05</span>
+                            <span class="stage-status" id="step-status-5">Standby</span>
+                        </div>
+                        <div class="stage-title">Mitigation</div>
+                        <div class="stage-detail">Safe-PPO & K8s Actuation</div>
                     </div>
-                    <div class="step-arrow">&rarr;</div>
 
-                    <div class="runway-step" id="step-card-6">
-                        <div class="step-num">06</div>
-                        <div class="step-label">VERIFY</div>
-                        <div class="step-desc">Canary & Rollback Guard</div>
-                        <div class="step-status" id="step-status-6">STANDBY</div>
+                    <div class="stage-separator"></div>
+
+                    <div class="stage-item" id="step-card-6">
+                        <div class="stage-header">
+                            <span class="stage-index">06</span>
+                            <span class="stage-status" id="step-status-6">Standby</span>
+                        </div>
+                        <div class="stage-title">Verification</div>
+                        <div class="stage-detail">Canary Probing & Rollback</div>
                     </div>
                 </div>
 
-                <div class="runway-ticker">
-                    <span class="ticker-badge">PIPELINE LOG</span>
-                    <span class="ticker-text" id="pipeline-status-text">System operational in steady state. Continuous OpenTelemetry scraping active.</span>
+                <div class="workflow-status-bar">
+                    <span class="status-bar-prefix">STATUS</span>
+                    <span class="status-bar-message" id="pipeline-status-text">All microservices healthy. Telemetry ingestion active.</span>
                 </div>
             </div>
         </section>
 
-        <!-- 3. Key Golden Signals Summary -->
-        <section class="signals-strip">
+        <!-- Golden Signals Metric Cards -->
+        <section class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">P99 TAIL LATENCY</span>
-                    <span class="metric-target">SLO &lt; 100ms</span>
+                <div class="metric-top">
+                    <span class="metric-name">P99 Latency</span>
+                    <span class="metric-threshold">SLO &lt; 100ms</span>
                 </div>
-                <div class="metric-value-box">
-                    <span class="metric-main-value" id="metric-p99">45.0 <span class="unit">ms</span></span>
-                </div>
-                <div class="metric-chart">
-                    <canvas id="chart-p99" height="45"></canvas>
+                <div class="metric-body">
+                    <div class="metric-num" id="metric-p99">45.0 <span class="unit">ms</span></div>
+                    <div class="metric-sparkline">
+                        <canvas id="chart-p99" height="40"></canvas>
+                    </div>
                 </div>
             </div>
 
             <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">GLOBAL ERROR RATE</span>
-                    <span class="metric-target">SLO &lt; 0.1%</span>
+                <div class="metric-top">
+                    <span class="metric-name">Error Rate</span>
+                    <span class="metric-threshold">SLO &lt; 0.1%</span>
                 </div>
-                <div class="metric-value-box">
-                    <span class="metric-main-value" id="metric-error">0.08 <span class="unit">%</span></span>
-                </div>
-                <div class="metric-chart">
-                    <canvas id="chart-error" height="45"></canvas>
-                </div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">ORDER-DB POOL SATURATION</span>
-                    <span class="metric-target">HikariCP Limit: 50</span>
-                </div>
-                <div class="metric-value-box">
-                    <span class="metric-main-value" id="metric-pool">30.0 <span class="unit">%</span></span>
-                </div>
-                <div class="metric-chart">
-                    <canvas id="chart-pool" height="45"></canvas>
+                <div class="metric-body">
+                    <div class="metric-num" id="metric-error">0.08 <span class="unit">%</span></div>
+                    <div class="metric-sparkline">
+                        <canvas id="chart-error" height="40"></canvas>
+                    </div>
                 </div>
             </div>
 
             <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">TOTAL CLUSTER THROUGHPUT</span>
-                    <span class="metric-target">100 Microservices</span>
+                <div class="metric-top">
+                    <span class="metric-name">Database Pool Saturation</span>
+                    <span class="metric-threshold">HikariCP Limit: 50</span>
                 </div>
-                <div class="metric-value-box">
-                    <span class="metric-main-value" id="metric-rps">3,850 <span class="unit">RPS</span></span>
+                <div class="metric-body">
+                    <div class="metric-num" id="metric-pool">30.0 <span class="unit">%</span></div>
+                    <div class="metric-sparkline">
+                        <canvas id="chart-pool" height="40"></canvas>
+                    </div>
                 </div>
-                <div class="metric-chart">
-                    <canvas id="chart-rps" height="45"></canvas>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-top">
+                    <span class="metric-name">Cluster Throughput</span>
+                    <span class="metric-threshold">100 Microservices</span>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-num" id="metric-rps">3,850 <span class="unit">RPS</span></div>
+                    <div class="metric-sparkline">
+                        <canvas id="chart-rps" height="40"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. Main Tabbed Workspace (Clean & De-cluttered) -->
-        <main class="workspace-tabs-container">
-            <!-- Navigation Tabs -->
-            <div class="tab-header">
-                <div class="tab-nav-buttons">
-                    <button class="tab-btn active" onclick="switchTab('tab-topology')">
+        <!-- Main Tabbed Content Workspace -->
+        <main class="content-workspace">
+            <div class="tab-bar">
+                <div class="tab-links">
+                    <button class="tab-link active" onclick="switchTab('tab-topology')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="18" cy="5" r="3"></circle>
                             <circle cx="6" cy="12" r="3"></circle>
@@ -209,182 +234,176 @@
                             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
                             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                         </svg>
-                        <span>Dynamic Service Topology</span>
+                        <span>Service Dependency Map</span>
                     </button>
-                    <button class="tab-btn" onclick="switchTab('tab-simulation')">
+                    <button class="tab-link" onclick="switchTab('tab-simulation')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 20V10M12 20V4M6 20v-6"></path>
                         </svg>
-                        <span>Digital Twin Simulation</span>
+                        <span>Pre-Flight Policy Simulation</span>
                     </button>
-                    <button class="tab-btn" onclick="switchTab('tab-audit')">
+                    <button class="tab-link" onclick="switchTab('tab-audit')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                             <line x1="16" y1="13" x2="8" y2="13"></line>
                             <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
-                        <span>Incident Audit Ledger</span>
+                        <span>Incident History & Post-Mortems</span>
                     </button>
                 </div>
 
-                <div class="tab-actions" id="tab-top-actions">
-                    <span class="view-toggle-label">TOPOLOGY VIEW:</span>
-                    <button class="micro-btn active" id="btn-toggle-view" onclick="toggleGraphFocus()">Blast Radius Focus</button>
-                    <button class="micro-btn" onclick="resetGraphView()">Center View</button>
+                <div class="tab-controls" id="tab-top-actions">
+                    <span class="control-label">Topology Filter:</span>
+                    <button class="btn btn-sm active" id="btn-toggle-view" onclick="toggleGraphFocus()">Focused Blast Radius</button>
+                    <button class="btn btn-sm" onclick="resetGraphView()">Center View</button>
                 </div>
             </div>
 
-            <!-- Tab 1: Dynamic Service Topology & Service Inspector -->
-            <div class="tab-content active" id="tab-topology">
-                <div class="topology-layout">
-                    <!-- Graph Canvas -->
-                    <div class="graph-card">
-                        <div class="graph-card-header">
-                            <div class="graph-legend">
-                                <span class="legend-item"><span class="legend-pip healthy"></span> Healthy (Operational)</span>
-                                <span class="legend-item"><span class="legend-pip degraded"></span> Degraded (Victim Symptom)</span>
-                                <span class="legend-item"><span class="legend-pip culprit"></span> Root Culprit (Isolated)</span>
-                                <span class="legend-item"><span class="legend-pip healing"></span> Self-Healing</span>
-                            </div>
-                            <span class="graph-info-hint">Click any microservice node to inspect telemetry</span>
+            <!-- Tab 1: Service Map & Inspector -->
+            <div class="tab-pane active" id="tab-topology">
+                <div class="service-map-layout">
+                    <!-- Graph Viewport -->
+                    <div class="graph-container">
+                        <div class="graph-legend">
+                            <span class="legend-badge"><span class="pip healthy"></span> Operational</span>
+                            <span class="legend-badge"><span class="pip degraded"></span> Degraded (Symptom)</span>
+                            <span class="legend-badge"><span class="pip culprit"></span> Root Cause Culprit</span>
+                            <span class="legend-badge"><span class="pip healing"></span> Self-Healing</span>
                         </div>
-                        <div id="network-topology-container" class="graph-viewport">
-                            <div class="viewport-loader">INITIALIZING TOPOLOGY FABRIC...</div>
+                        <div id="network-topology-container" class="graph-canvas">
+                            <div class="canvas-loader">Loading cluster topology fabric...</div>
                         </div>
                     </div>
 
-                    <!-- Compact Service Inspector -->
-                    <div class="inspector-card">
-                        <div class="inspector-header">
+                    <!-- Service Inspector Pane -->
+                    <div class="service-inspector">
+                        <div class="inspector-top">
                             <div>
-                                <span class="inspector-badge">SERVICE INSPECTOR</span>
-                                <h3 id="inspector-service-name">Order-DB-Adapter [svc-066]</h3>
+                                <span class="inspector-sub">SERVICE DETAIL</span>
+                                <h3 class="inspector-name" id="inspector-service-name">Order-DB-Adapter [svc-066]</h3>
                             </div>
-                            <span class="status-chip chip-safe" id="inspector-service-status">HEALTHY</span>
+                            <span class="badge badge-healthy" id="inspector-service-status">HEALTHY</span>
                         </div>
 
-                        <div class="inspector-metrics">
-                            <div class="ins-metric">
-                                <span class="ins-label">TAIL LATENCY (P99)</span>
-                                <span class="ins-val" id="ins-p99">45.0 ms</span>
+                        <div class="inspector-grid">
+                            <div class="stat-box">
+                                <span class="stat-label">Tail Latency (P99)</span>
+                                <span class="stat-val" id="ins-p99">45.0 ms</span>
                             </div>
-                            <div class="ins-metric">
-                                <span class="ins-label">ERROR RATE</span>
-                                <span class="ins-val" id="ins-err">0.08%</span>
+                            <div class="stat-box">
+                                <span class="stat-label">Error Rate</span>
+                                <span class="stat-val" id="ins-err">0.08%</span>
                             </div>
-                            <div class="ins-metric">
-                                <span class="ins-label">DB POOL USAGE</span>
-                                <span class="ins-val" id="ins-pool">15 / 50 (30%)</span>
+                            <div class="stat-box">
+                                <span class="stat-label">Database Pool</span>
+                                <span class="stat-val" id="ins-pool">15 / 50 (30%)</span>
                             </div>
-                            <div class="ins-metric">
-                                <span class="ins-label">REPLICAS / HOST</span>
-                                <span class="ins-val" id="ins-reps">3 Pods</span>
+                            <div class="stat-box">
+                                <span class="stat-label">Pod Replicas</span>
+                                <span class="stat-val" id="ins-reps">3 Pods</span>
                             </div>
                         </div>
 
-                        <div class="inspector-logs">
-                            <div class="logs-header">
-                                <span>LIVE LOG PREVIEW (HikariCP / JVM)</span>
-                            </div>
-                            <pre class="logs-body" id="ins-log-preview">[INFO] HikariPool-1 - Connection pool initialized with maximumPoolSize=50, idleTimeout=30000ms
+                        <div class="service-logs">
+                            <div class="logs-title">Diagnostic Logs (gRPC / JVM / HikariCP)</div>
+                            <pre class="logs-console" id="ins-log-preview">[INFO] HikariPool-1 - Connection pool initialized with maximumPoolSize=50, idleTimeout=30000ms
 [INFO] Dispatched 410 req/s to postgresql://order-cluster-primary:5432/orders</pre>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Digital Twin Simulation -->
-            <div class="tab-content" id="tab-simulation">
-                <div class="panel-inner">
-                    <div class="panel-desc-box">
+            <!-- Tab 2: Pre-Flight Simulation -->
+            <div class="tab-pane" id="tab-simulation">
+                <div class="pane-inner">
+                    <div class="pane-description">
                         <h3>Digital Twin Queuing Simulation & Safe-PPO Policy Ranking</h3>
-                        <p>Simulates candidate interventions in an M/M/c queuing sandbox prior to live execution. Evaluates projected latency drops against the constrained blast budget (J_C &le; 0.05).</p>
+                        <p>Simulates candidate interventions in an M/M/c queuing sandbox prior to live actuation. Evaluates projected latency recovery curves against the operational blast budget (J_C &le; 0.05).</p>
                     </div>
 
-                    <table class="clean-table">
+                    <table class="data-table">
                         <thead>
                             <tr>
-                                <th>REMEDIATION CANDIDATE</th>
-                                <th>PROJECTED &Delta;P99</th>
-                                <th>BLAST COST (c_t)</th>
-                                <th>SAFETY CONSTRAINT</th>
-                                <th>SAFE-PPO DECISION</th>
+                                <th>Remediation Action</th>
+                                <th>Projected &Delta;P99</th>
+                                <th>Blast Radius Cost (c_t)</th>
+                                <th>Safety Constraint</th>
+                                <th>Policy Decision</th>
                             </tr>
                         </thead>
                         <tbody id="twin-actions-body">
-                            <tr class="action-selected">
+                            <tr class="row-highlight">
                                 <td>
-                                    <div class="table-primary-text">RESIZE_DB_CONN_POOL</div>
-                                    <div class="table-sub-text">maxPoolSize: 50 &rarr; 120 &bull; leakDetect: 5s</div>
+                                    <div class="action-primary">RESIZE_DB_CONN_POOL</div>
+                                    <div class="action-secondary">maxPoolSize: 50 &rarr; 120 &bull; leakDetect: 5s</div>
                                 </td>
-                                <td><span class="val-positive">-88.0%</span></td>
-                                <td><span class="code-pill">0.010</span></td>
-                                <td><span class="chip-safe">SAFE (&le;0.05)</span></td>
-                                <td><span class="chip-active">SELECTED</span></td>
+                                <td><span class="txt-blue">-88.0%</span></td>
+                                <td><span class="mono-tag">0.010</span></td>
+                                <td><span class="badge badge-healthy">SAFE (&le;0.05)</span></td>
+                                <td><span class="badge badge-blue">SELECTED</span></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="table-primary-text">HORIZONTAL_POD_AUTOSCALE</div>
-                                    <div class="table-sub-text">Replicas: 3 &rarr; 6 pods</div>
+                                    <div class="action-primary">HORIZONTAL_POD_AUTOSCALE</div>
+                                    <div class="action-secondary">Replicas: 3 &rarr; 6 pods</div>
                                 </td>
-                                <td><span class="val-muted">-40.0%</span></td>
-                                <td><span class="code-pill">0.090</span></td>
-                                <td><span class="chip-breached">BREACHED</span></td>
-                                <td><span class="chip-muted">REJECTED</span></td>
+                                <td><span class="txt-muted">-40.0%</span></td>
+                                <td><span class="mono-tag">0.090</span></td>
+                                <td><span class="badge badge-orange">BREACHED</span></td>
+                                <td><span class="badge badge-muted">REJECTED</span></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="table-primary-text">GRACEFUL_POD_RESTART</div>
-                                    <div class="table-sub-text">Rolling container restart</div>
+                                    <div class="action-primary">GRACEFUL_POD_RESTART</div>
+                                    <div class="action-secondary">Rolling container restart</div>
                                 </td>
-                                <td><span class="val-muted">-55.0%</span></td>
-                                <td><span class="code-pill">0.070</span></td>
-                                <td><span class="chip-breached">BREACHED</span></td>
-                                <td><span class="chip-muted">REJECTED</span></td>
+                                <td><span class="txt-muted">-55.0%</span></td>
+                                <td><span class="mono-tag">0.070</span></td>
+                                <td><span class="badge badge-orange">BREACHED</span></td>
+                                <td><span class="badge badge-muted">REJECTED</span></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="table-primary-text">CIRCUIT_BREAK</div>
-                                    <div class="table-sub-text">40% adaptive traffic shedding</div>
+                                    <div class="action-primary">CIRCUIT_BREAK</div>
+                                    <div class="action-secondary">40% adaptive traffic shedding</div>
                                 </td>
-                                <td><span class="val-muted">-65.0%</span></td>
-                                <td><span class="code-pill">0.080</span></td>
-                                <td><span class="chip-breached">BREACHED</span></td>
-                                <td><span class="chip-muted">REJECTED</span></td>
+                                <td><span class="txt-muted">-65.0%</span></td>
+                                <td><span class="mono-tag">0.080</span></td>
+                                <td><span class="badge badge-orange">BREACHED</span></td>
+                                <td><span class="badge badge-muted">REJECTED</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Tab 3: Incident Audit Ledger -->
-            <div class="tab-content" id="tab-audit">
-                <div class="panel-inner">
-                    <div class="panel-desc-box audit-header-box">
+            <!-- Tab 3: Incident History Ledger -->
+            <div class="tab-pane" id="tab-audit">
+                <div class="pane-inner">
+                    <div class="pane-description header-with-btn">
                         <div>
-                            <h3>Closed-Loop Incident Post-Mortem Ledger</h3>
-                            <p>Immutable audit trail of autonomous detections, causal diagnoses, executed Kubernetes patches, and canary verification verdicts.</p>
+                            <h3>Incident History & Post-Mortem Ledger</h3>
+                            <p>Audit trail of automated failure detections, causal diagnoses, Kubernetes mutations, and post-intervention canary verification results.</p>
                         </div>
-                        <button class="btn btn-outline small" onclick="exportAuditLedger()">Export Audit JSON</button>
+                        <button class="btn btn-secondary" onclick="exportAuditLedger()">Export Audit JSON</button>
                     </div>
 
-                    <table class="clean-table">
+                    <table class="data-table">
                         <thead>
                             <tr>
-                                <th>INCIDENT ID</th>
-                                <th>CULPRIT SERVICE</th>
-                                <th>CAUSAL CONFIDENCE</th>
-                                <th>EXECUTED REMEDIATION</th>
+                                <th>Incident ID</th>
+                                <th>Culprit Service</th>
+                                <th>Causal Confidence</th>
+                                <th>Remediation Executed</th>
                                 <th>MTTD</th>
                                 <th>MTTR</th>
-                                <th>VERDICT</th>
+                                <th>Verdict</th>
                             </tr>
                         </thead>
                         <tbody id="incident-ledger-body">
                             <tr>
-                                <td colspan="7" class="empty-state">No incidents logged yet. Trigger a synthetic fault above to initiate the autonomous self-healing cycle.</td>
+                                <td colspan="7" class="empty-state">No incidents logged. Execute a failure simulation above to observe the automated remediation workflow.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -393,7 +412,7 @@
         </main>
     </div>
 
-    <!-- Live Application JavaScript -->
-    <script src="/static/js/app.js?v=revamp.1.0"></script>
+    <!-- Application Script -->
+    <script src="/static/js/app.js?v=b2b.3.0"></script>
 </body>
 </html>

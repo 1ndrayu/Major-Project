@@ -38,13 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // 1. Tab Navigation
 // -------------------------------------------------------------
 function switchTab(tabId) {
-    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-    document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".tab-pane").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".tab-item").forEach(el => el.classList.remove("active"));
 
     const targetContent = document.getElementById(tabId);
     if (targetContent) targetContent.classList.add("active");
 
-    const activeBtn = Array.from(document.querySelectorAll(".tab-btn")).find(btn =>
+    const activeBtn = Array.from(document.querySelectorAll(".tab-item")).find(btn =>
         btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)
     );
     if (activeBtn) activeBtn.classList.add("active");
@@ -226,22 +226,22 @@ function renderGraph() {
     }
 
     filteredNodes.forEach((n) => {
-        let bgColor = "#10131a";
-        let borderColor = "#0ea5e9";
-        let fontColor = "#f1f5f9";
+        let bgColor = "#14171d";
+        let borderColor = "#3b82f6";
+        let fontColor = "#ffffff";
 
         if (n.status === "CRITICAL") {
-            bgColor = "#ff6b00";
+            bgColor = "#ea580c";
             borderColor = "#ffffff";
-            fontColor = "#000000";
+            fontColor = "#ffffff";
         } else if (n.status === "DEGRADED") {
-            bgColor = "#ff8533";
-            borderColor = "#ff6b00";
+            bgColor = "#fb923c";
+            borderColor = "#ea580c";
             fontColor = "#000000";
         } else if (n.status === "SELF_HEALING") {
-            bgColor = "#0ea5e9";
-            borderColor = "#38bdf8";
-            fontColor = "#000000";
+            bgColor = "#2563eb";
+            borderColor = "#60a5fa";
+            fontColor = "#ffffff";
         }
 
         visNodes.push({
@@ -251,9 +251,9 @@ function renderGraph() {
             color: {
                 background: bgColor,
                 border: borderColor,
-                highlight: { background: "#ff6b00", border: "#ffffff" }
+                highlight: { background: "#ea580c", border: "#ffffff" }
             },
-            font: { color: fontColor, size: 10, face: "Space Grotesk" },
+            font: { color: fontColor, size: 10, face: "Inter" },
             shape: n.tier === "DATABASE" ? "database" : (n.tier === "GATEWAY" ? "diamond" : "dot"),
             size: n.id === "svc-066" ? 22 : 13
         });
@@ -268,7 +268,7 @@ function renderGraph() {
                 from: e.source,
                 to: e.target,
                 arrows: "to",
-                color: { color: isHighLatency ? "#ff6b00" : "rgba(14, 165, 233, 0.4)", opacity: isHighLatency ? 0.95 : 0.6 },
+                color: { color: isHighLatency ? "#ea580c" : "rgba(59, 130, 246, 0.35)", opacity: isHighLatency ? 0.95 : 0.6 },
                 width: isHighLatency ? 2.2 : 1.0
             });
         }
@@ -327,13 +327,13 @@ function selectService(serviceId) {
     statusEl.textContent = n.status;
 
     if (n.status === "CRITICAL") {
-        statusEl.className = "status-chip chip-breached";
+        statusEl.className = "badge badge-orange";
     } else if (n.status === "DEGRADED") {
-        statusEl.className = "status-chip chip-gold";
+        statusEl.className = "badge badge-orange";
     } else if (n.status === "SELF_HEALING") {
-        statusEl.className = "status-chip chip-selected";
+        statusEl.className = "badge badge-blue";
     } else {
-        statusEl.className = "status-chip chip-safe";
+        statusEl.className = "badge badge-healthy";
     }
 
     document.getElementById("ins-p99").textContent = `${n.p99_latency_ms.toFixed(1)} ms`;
@@ -386,11 +386,11 @@ function initWebSocket() {
                 const pip = document.getElementById("system-status-pip");
 
                 if (faultCount === 0) {
-                    badgeText.textContent = "100 MICROSERVICES OPERATIONAL";
-                    pip.className = "pip pip-live";
+                    badgeText.textContent = "All 100 Services Operational";
+                    pip.className = "status-dot healthy";
                 } else {
-                    badgeText.textContent = `ANOMALY DETECTED // ${faultCount} ACTIVE FAULT${faultCount === 1 ? '' : 'S'}`;
-                    pip.className = "pip pip-critical";
+                    badgeText.textContent = `Incident Active • ${faultCount} Active Fault${faultCount === 1 ? '' : 's'}`;
+                    pip.className = "status-dot critical";
                 }
 
                 if (data.active_faults) {
@@ -416,22 +416,22 @@ async function refreshTopologyStatus(activeFaults) {
         data.nodes.forEach(n => {
             nodeLookup[n.id] = n;
             if (networkData.nodes && networkData.nodes.get(n.id)) {
-                let bgColor = "#10131a";
-                let borderColor = "#0ea5e9";
-                let fontColor = "#f1f5f9";
+                let bgColor = "#14171d";
+                let borderColor = "#3b82f6";
+                let fontColor = "#ffffff";
 
                 if (n.status === "CRITICAL") {
-                    bgColor = "#ff6b00";
+                    bgColor = "#ea580c";
                     borderColor = "#ffffff";
-                    fontColor = "#000000";
+                    fontColor = "#ffffff";
                 } else if (n.status === "DEGRADED") {
-                    bgColor = "#ff8533";
-                    borderColor = "#ff6b00";
+                    bgColor = "#fb923c";
+                    borderColor = "#ea580c";
                     fontColor = "#000000";
                 } else if (n.status === "SELF_HEALING") {
-                    bgColor = "#0ea5e9";
-                    borderColor = "#38bdf8";
-                    fontColor = "#000000";
+                    bgColor = "#2563eb";
+                    borderColor = "#60a5fa";
+                    fontColor = "#ffffff";
                 }
 
                 networkData.nodes.update({
@@ -459,14 +459,14 @@ function setPipelineStage(stageNum, message) {
         if (!card || !statusEl) continue;
 
         if (i < stageNum) {
-            card.className = "runway-step completed";
-            statusEl.textContent = "VERIFIED";
+            card.className = "stage-item completed";
+            statusEl.textContent = "Verified";
         } else if (i === stageNum) {
-            card.className = "runway-step active";
-            statusEl.textContent = "EXECUTING";
+            card.className = "stage-item active";
+            statusEl.textContent = "Running";
         } else {
-            card.className = "runway-step";
-            statusEl.textContent = "STANDBY";
+            card.className = "stage-item";
+            statusEl.textContent = "Standby";
         }
     }
     if (message) {
@@ -500,8 +500,8 @@ async function stepStage() {
             for (let i = 1; i <= 6; i++) {
                 const card = document.getElementById(`step-card-${i}`);
                 const statusEl = document.getElementById(`step-status-${i}`);
-                if (card) card.className = "runway-step completed";
-                if (statusEl) statusEl.textContent = "VERIFIED";
+                if (card) card.className = "stage-item completed";
+                if (statusEl) statusEl.textContent = "Verified";
             }
             document.getElementById("pipeline-status-text").textContent = res.message;
             currentStage = 1;
@@ -530,13 +530,13 @@ async function triggerAutoHeal() {
 
     autoBtn.disabled = true;
     stepBtn.disabled = true;
-    autoBtn.innerHTML = `<span>Running OODA Loop...</span>`;
+    autoBtn.innerHTML = `<span>Remediating Incident...</span>`;
 
     const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
     try {
         for (let s = 1; s <= 6; s++) {
-            setPipelineStage(s, `Executing Stage 0${s} in autonomous closed-loop...`);
+            setPipelineStage(s, `Executing Stage 0${s} in automated remediation pipeline...`);
 
             const resp = await fetch("/api/self-heal/step", {
                 method: "POST",
@@ -558,8 +558,8 @@ async function triggerAutoHeal() {
         for (let i = 1; i <= 6; i++) {
             const card = document.getElementById(`step-card-${i}`);
             const statusEl = document.getElementById(`step-status-${i}`);
-            if (card) card.className = "runway-step completed";
-            if (statusEl) statusEl.textContent = "VERIFIED";
+            if (card) card.className = "stage-item completed";
+            if (statusEl) statusEl.textContent = "Verified";
         }
 
         refreshLedger();
@@ -618,19 +618,19 @@ async function refreshLedger() {
         const tbody = document.getElementById("incident-ledger-body");
 
         if (!data.incidents || data.incidents.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No incidents logged yet. Trigger a synthetic fault above to initiate the autonomous cycle.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No incidents logged. Execute a failure simulation above to observe the automated remediation workflow.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = data.incidents.map(inc => `
             <tr>
-                <td><span class="code-pill">${inc.incident_id}</span></td>
+                <td><span class="mono-tag">${inc.incident_id}</span></td>
                 <td><strong style="color:var(--accent-orange)">${inc.culprit_service}</strong></td>
-                <td><span class="chip-gold">94.0%</span></td>
-                <td><span class="code-pill">${inc.remediation_action}</span></td>
-                <td><span class="code-pill">${inc.mttd_sec}s</span></td>
-                <td><span class="val-positive">${inc.mttr_sec}s</span></td>
-                <td><span class="status-chip chip-safe">${inc.verdict}</span></td>
+                <td><span class="mono-tag">94.0%</span></td>
+                <td><span class="mono-tag">${inc.remediation_action}</span></td>
+                <td><span class="txt-muted">${inc.mttd_sec}s</span></td>
+                <td><span class="txt-muted">${inc.mttr_sec}s</span></td>
+                <td><span class="badge badge-blue">${inc.verdict}</span></td>
             </tr>
         `).join("");
     } catch (e) {
